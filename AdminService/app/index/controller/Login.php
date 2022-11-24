@@ -56,6 +56,8 @@ class Login extends Controller {
         $User=new User();
         // 注册
         $uuid=$User->register($username,$password);
+        if($uuid==='')
+            return json(array('code'=>0,'msg'=>$User->error_info['register']));
         return json(array('code'=>200,'msg'=>'绑定成功','uuid'=>$uuid));
     }
 

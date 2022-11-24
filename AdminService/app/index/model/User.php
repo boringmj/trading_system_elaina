@@ -44,7 +44,12 @@ class User extends Model {
         // 处理用户登录
         $password=$this->encryptPassword($password);
         try {
-            $uuid=$this->where('username',$username)->where('password',$password)->find('uuid')['uuid'];
+            $user_info=$this->where('username',$username)->where('password',$password)->find(array('uuid','status'));
+            if($user_info['status']!==1) {
+                $this->error_info['login']='用户状态异常';
+                return array();
+            }
+            $uuid=$user_info['uuid'];
             // 生成令牌
             $Token=new Token();
             $token=$Token->createToken($uuid);
@@ -76,7 +81,12 @@ class User extends Model {
         // 生成UUID
         $uuid=\AdminService\common\uuid(true);
         try {
-           
+            // 判断用户名是否已存在
+            $user_info=$this->where('username',$username)->find();
+            if(!empty($user_info)) {
+                $this->error_info['register']='用户名已存在';
+                return '';
+            }
             // 保存用户信息
             $this->insert(array(
                 'username'=>$username,
