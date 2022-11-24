@@ -12,6 +12,9 @@ return array(
     // app 相关配置
     'app'=>array(
         'path'=>__DIR__.'/app',
+        'config'=>array(
+            'index'=>include __DIR__.'/app/index/config.php',
+        )
     ),
 
     // route 相关配置
@@ -51,7 +54,8 @@ return array(
         'loader'=>array( // 需要自动加载的函数文件名(不含扩展名)
             'uuid', // uuid函数
             'helper', // 通用助手函数
-            'controller_helper' // 控制器助手函数
+            'controller_helper', // 控制器助手函数
+            'sign' // 签名函数
         )
     ),
 
@@ -79,7 +83,7 @@ return array(
     // cookie 相关配置
     'cookie'=>array(
         'prefix'=>'', // 前缀 default: ''
-        'expire'=>3600, // 过期时间 default: 3600
+        'expire'=>604800, // 过期时间 default: 3600
         'path'=>'', // 路径 default: ''
         'domain'=>'', // 域名 default: ''
         'secure'=>false, // 是否仅仅通过安全的 HTTPS 连接传给客户端 default: false
