@@ -46,7 +46,7 @@ class Token extends Model {
         $expire=$timestamp+($expire??Config::get('app.config.index.user.token.expire',3600));
         try {
             // 判断是否需要删除旧令牌
-            if(Config::get('app.config.index.user.token.allow_multiple',false))
+            if(!Config::get('app.config.index.user.token.allow_multiple',false))
                 $this->where('uuid',$uuid)->delete();
             // 保存新令牌
             $this->insert(array(
