@@ -25,11 +25,11 @@ class Token extends Model {
      * 为用户创建一个新令牌
      * 
      * @access public
-     * @param int $uuid 用户ID
+     * @param string $uuid 用户ID
      * @param string $expire 令牌过期时间
      * @return string
      */
-    public function createToken(int $uuid,string $expire=null): string {
+    public function createToken(string $uuid,string $expire=null): string {
         // 检查用户真实性(防止无意义的令牌生成)
         if(Config::get('app.config.index.user.token.check',false))
         {

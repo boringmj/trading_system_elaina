@@ -26,7 +26,7 @@ class Login extends Controller {
             'token'=>$user_info['token'],
             'uuid'=>$user_info['uuid']
         ));
-        return json(array('code'=>200,'msg'=>'登录成功',array(
+        return json(array('code'=>200,'msg'=>'登录成功','data'=>array(
             'token'=>$user_info['token'],
             'uuid'=>$user_info['uuid']
         )));

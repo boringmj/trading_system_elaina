@@ -44,7 +44,7 @@ class User extends Model {
         // 处理用户登录
         $password=$this->encryptPassword($password);
         try {
-            $uuid=$this->where('username',$username)->where('password',$password)->find('uuid');
+            $uuid=$this->where('username',$username)->where('password',$password)->find('uuid')['uuid'];
             // 生成令牌
             $Token=new Token();
             $token=$Token->createToken($uuid);
