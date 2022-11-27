@@ -1,11 +1,11 @@
 <?php
 
-namespace app\index\model;
+namespace AdminService\model;
 
 use base\Model;
 use AdminService\Config;
 use AdminService\Exception;
-use app\index\model\User;
+use AdminService\model\User;
 
 class Token extends Model {
 

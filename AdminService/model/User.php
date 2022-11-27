@@ -1,11 +1,11 @@
 <?php
 
-namespace app\index\model;
+namespace AdminService\model;
 
 use base\Model;
 use AdminService\Config;
 use AdminService\Exception;
-use app\index\model\Token;
+use AdminService\model\Token;
 
 class User extends Model {
 
@@ -45,6 +45,11 @@ class User extends Model {
         $password=$this->encryptPassword($password);
         try {
             $user_info=$this->where('username',$username)->where('password',$password)->find(array('uuid','status'));
+            if(empty($user_info))
+            {
+                $this->error_info['login']='用户名或密码错误';
+                return array();
+            }
             if($user_info['status']!==1) {
                 $this->error_info['login']='用户状态异常';
                 return array();
