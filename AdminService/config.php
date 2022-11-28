@@ -13,7 +13,7 @@ return array(
     'app'=>array(
         'path'=>__DIR__.'/app',
         'config'=>array(
-            'index'=>include __DIR__.'/app/index/config.php',
+            'all'=>include __DIR__.'/app/config.php',
         )
     ),
 
