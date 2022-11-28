@@ -73,9 +73,9 @@ class Room extends Model {
             }
         }else{
             // 寻找id对应的room_uuid
-            $room_info=$this->where('id',$id)->find();
+            $room_info=$this->where('id',$id)->where('public',0)->find();
             if(empty($room_info))
-                throw new Exception('房间不存在');
+                throw new Exception('私有房间不存在');
             $room_uuid=$room_info['rmid'];
         }
         // 加入房间
