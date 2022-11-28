@@ -82,4 +82,17 @@ class Room extends Model {
         return $Player->joinRoom($token,$room_uuid);
     }
 
+    /**
+     * 退出房间
+     * 
+     * @param string $token 用户Token
+     * @param string $room_uuid 房间ID
+     * @return array
+     * @throws Exception
+     */
+    public function quitRoom(string $token,string $room_uuid): array {
+        $Player=new Players();
+        return $Player->leaveRoom($token,$room_uuid);
+    }
+
 }

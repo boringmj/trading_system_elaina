@@ -45,6 +45,42 @@ class Players extends Model {
             'serial'=>count($room_info['players'])+1,
             'create_time'=>time()
         ));
+        // 减少房间剩余座位
+        $Room->where('rmid',$room_uuid)->update(array(
+            'vacancy'=>$room_info['vacancy']-1
+        ));
+        // 重新获取房间信息
+        $room_info=$Room->getRoomInfo($room_uuid);
+        return $room_info;
+    }
+
+    /**
+     * 玩家离开房间
+     * 
+     * @param string $token 用户Token
+     * @param string $room_uuid 房间UUID
+     * @return array
+     * @throws Exception
+     */
+    public function leaveRoom(string $token,string $room_uuid): array {
+        // 验证用户Token
+        $Token=new Token();
+        $token_info=$Token->getTokenInfo($token);
+        // 获取玩家uuid
+        $uuid=$token_info['uuid'];
+        // 获取房间信息
+        $Room=new Room();
+        $room_info=$Room->getRoomInfo($room_uuid);
+        // 判断玩家是否已经在房间中
+        $player_info=$this->where('uuid',$uuid)->where('rmid',$room_uuid)->find();
+        if(empty($player_info))
+            throw new Exception('玩家不在房间中');
+        // 离开房间
+        $this->where('uuid',$uuid)->where('rmid',$room_uuid)->delete();
+        // 增加房间剩余座位
+        $Room->where('rmid',$room_uuid)->update(array(
+            'vacancy'=>$room_info['vacancy']+1
+        ));
         // 重新获取房间信息
         $room_info=$Room->getRoomInfo($room_uuid);
         return $room_info;
