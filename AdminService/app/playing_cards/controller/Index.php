@@ -22,7 +22,7 @@ class Index extends Controller {
             $Players=new Players();
             $room_info=$Players->joinRoom($token,$room_uuid);
             // 返回结果
-            return json(1,'创建房间成功',$room_info);
+            return json(1,'创建房间成功');
         } catch (Exception $e) {
             return json(-1,$e->getMessage());
         }
@@ -35,7 +35,7 @@ class Index extends Controller {
         try {
             // 加入房间
             $Room=new Room();
-            return json(1,'加入房间成功',$Room->joinRoom($token,$room_id));
+            return json(1,'加入房间成功');
         } catch (Exception $e) {
             return json(-1,$e->getMessage());
         }
