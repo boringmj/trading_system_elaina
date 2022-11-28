@@ -4,7 +4,6 @@ namespace app\playing_cards\model;
 
 use base\Model;
 use AdminService\Exception;
-use AdminService\model\Token;
 use app\playing_cards\model\Players;
 
 class Room extends Model {
