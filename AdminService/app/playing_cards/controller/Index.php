@@ -46,7 +46,7 @@ class Index extends Controller {
         try {
             // 获取信息
             $Players=new Players();
-            return json(1,'获取信息成功',$Players->getPlayersRoomListByUUID($token));
+            return json(1,'获取信息成功',$Players->getPlayersRoomListByToken($token));
         } catch (\Exception $e) {
             return json(-1,$e->getMessage());
         }

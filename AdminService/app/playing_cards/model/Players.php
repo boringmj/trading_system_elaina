@@ -63,15 +63,21 @@ class Players extends Model {
     }
 
     /**
-     * 通过玩家UUID获取玩家加入的房间列表
+     * 通过玩家Token获取玩家加入的房间列表
      * 
-     * @param string $uuid 玩家UUID
+     * @param string $token 玩家Token
      * @return array
      * @throws Exception
      */
-    public function getPlayersRoomListByUUID(string $uuid): array {
-        $room_list=$this->where('uuid',$uuid)->select();
-        return $room_list;
+    public function getPlayersRoomListByToken(string $token): array {
+        // 验证用户Token
+        $Token=new Token();
+        $token_info=$Token->getTokenInfo($token);
+        // 获取玩家uuid
+        $uuid=$token_info['uuid'];
+        // 获取玩家加入的房间列表
+        $players_room_list=$this->where('uuid',$uuid)->select();
+        return $players_room_list;
     }
 
 }

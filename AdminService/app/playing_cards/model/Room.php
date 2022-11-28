@@ -27,7 +27,7 @@ class Room extends Model {
         $room_uuid=\AdminService\common\uuid(true);
         $room_info=array(
             'rmid'=>$room_uuid,
-            'is_public'=>(int)$is_public,
+            'public'=>(int)$is_public,
             'create_time'=>time(),
         );
         $this->insert($room_info);
