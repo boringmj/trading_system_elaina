@@ -40,6 +40,18 @@ class Index extends Controller {
         }
     }
 
+    public function get_info() {
+        // 获取参数
+        $token=$this->param('token','');
+        try {
+            // 获取信息
+            $Players=new Players();
+            return json(1,'获取信息成功',$Players->getPlayersRoomListByUUID($token));
+        } catch (\Exception $e) {
+            return json(-1,$e->getMessage());
+        }
+    }
+
 }
 
 ?>

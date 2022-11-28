@@ -62,4 +62,16 @@ class Players extends Model {
         return $players_list;
     }
 
+    /**
+     * 通过玩家UUID获取玩家加入的房间列表
+     * 
+     * @param string $uuid 玩家UUID
+     * @return array
+     * @throws Exception
+     */
+    public function getPlayersRoomListByUUID(string $uuid): array {
+        $room_list=$this->where('uuid',$uuid)->select();
+        return $room_list;
+    }
+
 }
