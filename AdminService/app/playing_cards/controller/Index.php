@@ -3,6 +3,7 @@
 namespace app\playing_cards\controller;
 
 use base\Controller;
+use AdminService\Exception;
 use app\playing_cards\model\Room;
 use app\playing_cards\model\Players;
 
@@ -22,7 +23,7 @@ class Index extends Controller {
             $room_info=$Players->joinRoom($token,$room_uuid);
             // 返回结果
             return json(1,'创建房间成功',$room_info);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return json(-1,$e->getMessage());
         }
     }
@@ -35,7 +36,7 @@ class Index extends Controller {
             // 加入房间
             $Room=new Room();
             return json(1,'加入房间成功',$Room->joinRoom($token,$room_id));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return json(-1,$e->getMessage());
         }
     }
@@ -47,7 +48,7 @@ class Index extends Controller {
             // 获取信息
             $Players=new Players();
             return json(1,'获取信息成功',$Players->getPlayersRoomListByToken($token));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return json(-1,$e->getMessage());
         }
     }
