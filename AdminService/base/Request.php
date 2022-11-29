@@ -116,7 +116,7 @@ abstract class Request {
         );
         // 获取 Content-Type 请求头
         $content_type=isset($_SERVER['CONTENT_TYPE'])?$_SERVER['CONTENT_TYPE']:'';
-        // 判断是否为 application/json(先通过“;”分割,防止有其他参数)
+        // 判断是否为 application/json
         if(strpos($content_type,'application/json')!==false) {
             // 获取请求数据
             $request_data=file_get_contents('php://input');
