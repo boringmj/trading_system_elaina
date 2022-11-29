@@ -59,10 +59,12 @@ class User extends Model {
      * @access public
      * @param string $username 用户名
      * @param string $password 密码
+     * @param string $nickname 昵称
+     * @param string $money 余额
      * @return array
      * @throws Exception
      */
-    public function register(string $username,string $password): string {
+    public function register(string $username,string $password,string $nickname='',int $money=0): string {
         // 处理用户注册
         $password=$this->encryptPassword($password);
         // 生成UUID
@@ -76,6 +78,8 @@ class User extends Model {
             'username'=>$username,
             'password'=>$password,
             'uuid'=>$uuid,
+            'nickname'=>$nickname,
+            'money'=>$money,
             'create_time'=>time()
         ));
         return $uuid;
