@@ -9,9 +9,11 @@ CREATE TABLE IF NOT EXISTS `trading_system_elaina_playing_cards_players` (
   `status` int(1) NOT NULL DEFAULT '0',
   `serial` int(1) NOT NULL DEFAULT '0',
   `cards` varchar(255) NULL DEFAULT NULL,
-  `cards_count` int(1) NOT NULL DEFAULT '0',
+  `group` varchar(2) NULL DEFAULT NULL,
+  `cards_count` int(2) NOT NULL DEFAULT '0',
   `cards_played` varchar(255) NULL DEFAULT NULL,
-  `create_time` int(10) NOT NULL
+  `create_time` int(10) NOT NULL,
+  `update_time` int(10) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 --

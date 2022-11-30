@@ -12,8 +12,10 @@ CREATE TABLE IF NOT EXISTS `trading_system_elaina_playing_cards_room` (
   `public` int(1) NOT NULL DEFAULT '1',
   `previous_player` int(1) NOT NULL DEFAULT '0',
   `current_player` int(1) NOT NULL DEFAULT '0',
+  `ranking` varchar(9) NULL DEFAULT NULL,
   `previous_cards` varchar(255) NULL DEFAULT NULL,
-  `create_time` int(10) NOT NULL
+  `create_time` int(10) NOT NULL,
+  `update_time` int(10) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 --

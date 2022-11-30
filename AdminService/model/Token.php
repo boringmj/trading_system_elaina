@@ -49,7 +49,7 @@ class Token extends Model {
     }
 
     /**
-     * 获取用户信息
+     * 获取Token信息
      * 
      * @access public
      * @param string $token 用户令牌

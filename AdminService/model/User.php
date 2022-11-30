@@ -86,7 +86,7 @@ class User extends Model {
     }
 
     /**
-     * 通过UUID获取用户信息
+     * 通过UUID获取用户信息(需要用户状态正常)
      * 
      * @access public
      * @param string $uuid
@@ -97,6 +97,8 @@ class User extends Model {
         $user_info=$this->where('uuid',$uuid)->find();
         if(empty($user_info))
             throw new Exception("用户不存在");
+        if($user_info['status']!==1)
+            throw new Exception("用户状态异常");
         return $user_info;
     }
 

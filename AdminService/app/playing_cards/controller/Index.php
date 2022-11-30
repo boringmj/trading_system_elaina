@@ -45,6 +45,20 @@ class Index extends Controller {
         }
     }
 
+    public function leave_room() {
+        // 获取参数
+        $token=$this->param('token','');
+        $rmid=$this->param('rmid','');
+        try {
+            // 离开房间
+            $Room=new Players();
+            $Room->leaveRoom($token,$rmid);
+            return json(1,'已离开房间');
+        } catch (Exception $e) {
+            return json(-1,$e->getMessage());
+        }
+    }
+
     public function get_info() {
         // 获取参数
         $token=$this->param('token','');
@@ -52,6 +66,20 @@ class Index extends Controller {
             // 获取信息
             $Players=new Players();
             return json(1,'获取信息成功',$Players->getPlayersRoomListByToken($token));
+        } catch (Exception $e) {
+            return json(-1,$e->getMessage());
+        }
+    }
+
+    public function heartbeat()
+    {
+        // 获取参数
+        $token=$this->param('token','');
+        $rmid=$this->param('rmid','');
+        try {
+            // 获取信息
+            $Room=new Room();
+            return json(1,'获取成功',$Room->heartbeat($token,$rmid));
         } catch (Exception $e) {
             return json(-1,$e->getMessage());
         }
