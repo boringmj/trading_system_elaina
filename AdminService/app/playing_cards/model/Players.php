@@ -44,7 +44,8 @@ class Players extends Model {
             'uuid'=>$uuid,
             'rmid'=>$room_uuid,
             'serial'=>count($room_info['players'])+1,
-            'create_time'=>time()
+            'create_time'=>time(),
+            'update_time'=>time()
         ));
         // 减少房间剩余座位
         $Room->where('rmid',$room_uuid)->update(array(

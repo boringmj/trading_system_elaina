@@ -31,6 +31,7 @@ class Room extends Model {
             'rmid'=>$room_uuid,
             'public'=>(int)$is_public,
             'create_time'=>time(),
+            'update_time'=>time()
         );
         $this->insert($room_info);
         return $room_uuid;
@@ -165,10 +166,15 @@ class Room extends Model {
         if(!$is_in_room)
             throw new Exception('用户不在房间中');
         // 刷新房间更新时间
-        $this->where('rmid',$room_uuid)->update(array('update_time'=>time()));
+        $this->where('rmid',$room_uuid)->where('status','1','<=')->update(array(
+            'update_time'=>time()
+        ));
         // 刷新玩家更新时间
         $Player=new Players();
-        $Player->where('uuid',$user_info['uuid'])->where('rmid',$room_uuid)->update(array('update_time'=>time()));
+        $Player->where('uuid',$user_info['uuid'])->where('status','1','<=')->where('rmid',$room_uuid)->update(array(
+            'update_time'=>time(),
+            'status'=>0,
+        ));
         // 返回结果
         $return_data_temp=array(
             'status'=>$room_info['status'],
@@ -199,7 +205,7 @@ class Room extends Model {
                 // 准备中
                 // 将30秒内无心跳的玩家踢出房间
                 $Player=new Players();
-                $timeout_list=$Player->where('rmid',$room_info['rmid'])->where('update_time','<',time()-30)->select();
+                $timeout_list=$Player->where('rmid',$room_info['rmid'])->where('update_time',time()-30,'<')->select();
                 // 删除对应的玩家并恢复房间空位
                 foreach($timeout_list as $value) {
                     $Player->where('uuid',$value['uuid'])->where('rmid',$room_info['rmid'])->delete();
@@ -214,9 +220,21 @@ class Room extends Model {
                 // 游戏中
                 // 设置心跳超时的游戏中的玩家为离线状态
                 $Player=new Players();
-                $Player->where('rmid',$room_info['rmid'])->where('status',0)->where('update_time','<',time()-60)->update(array('status'=>1));
+                $Player->where('rmid',$room_info['rmid'])->where('status',0)->where('update_time',time()-60,'<')->update(array('status'=>1));
                 // 判断当前出牌的玩家是否已经超时(离线状态,已经完成的玩家和没有手牌的玩家默认为超时)
                 $current_player_info=$Player->where('rmid',$room_info['rmid'])->where('serial',$room_info['current_player'])->find();
+                if(empty($current_player_info))
+                    throw new Exception('当前出牌玩家不存在');
+                // 如果当前出牌玩家已经完成且上轮出牌玩家还是当前出牌玩家,则该玩家的下一位玩家设置为当前出牌玩家且将上轮出牌玩家设置为下个玩家
+                if(($current_player_info['cards_count']===0||$current_player_info['status']===2)&&$room_info['previous_player']===$current_player_info['serial']) {
+                    $next=($current_player_info['serial']<$room_info['max_player'])?($current_player_info['serial']+1):1;
+                    $this->where('rmid',$room_info['rmid'])->update(array(
+                        'current_player'=>$next,
+                        'previous_player'=>$next,
+                        'timeouts'=>time()+61,
+                        'update_time'=>time()
+                    ));
+                }
                 if($current_player_info['status']!==0||$room_info['timeouts']<time()||$current_player_info['cards_count']===0) {
                     // 判断是否允许pass
                     $cards='';
@@ -231,14 +249,14 @@ class Room extends Model {
                             $cards_array=array_diff($cards_array,[$cards]);
                         }
                         // 将数组转换为字符串
-                        $$current_player_info['cards']=implode('',$cards_array);
+                        $current_player_info['cards']=implode('',$cards_array);
                     } else
                         $cards='pass';
-                     // 记录玩家出牌
+                    // 记录玩家出牌
                     $Player->where('uuid',$current_player_info['uuid'])->where('rmid',$room_info['rmid'])->update(array(
                         'cards'=>$current_player_info['cards'],
                         'cards_played'=>$cards,
-                        'cards_count'=>$current_player_info['cards']/2
+                        'cards_count'=>strlen($current_player_info['cards'])/2
                     ));
                     // 记录房间出牌信息(如果玩家出的牌不是pass则记录)
                     if($cards!=='pass')
@@ -248,7 +266,7 @@ class Room extends Model {
                         ));
                     // 更新到下一个玩家
                     $this->where('rmid',$room_info['rmid'])->update(array(
-                        'current_player'=>($current_player_info['serial']<$room_info['max_player']?$current_player_info['serial']+1:1),
+                        'current_player'=>($current_player_info['serial']<$room_info['max_player'])?($current_player_info['serial']+1):1,
                         'timeouts'=>time()+61,
                         'update_time'=>time()
                     ));
