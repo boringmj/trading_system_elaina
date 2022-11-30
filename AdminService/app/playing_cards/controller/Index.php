@@ -38,8 +38,10 @@ class Index extends Controller {
         try {
             // 加入房间
             $Room=new Room();
-            $Room->joinRoom($token,$room_id);
-            return json(1,'加入房间成功');
+            $room_info=$Room->joinRoom($token,$room_id);
+            return json(1,'加入房间成功',array(
+                'rmid'=>$room_info['rmid']
+            ));
         } catch (Exception $e) {
             return json(-1,$e->getMessage());
         }
@@ -71,8 +73,7 @@ class Index extends Controller {
         }
     }
 
-    public function heartbeat()
-    {
+    public function heartbeat() {
         // 获取参数
         $token=$this->param('token','');
         $rmid=$this->param('rmid','');
@@ -80,6 +81,20 @@ class Index extends Controller {
             // 获取信息
             $Room=new Room();
             return json(1,'获取成功',$Room->heartbeat($token,$rmid));
+        } catch (Exception $e) {
+            return json(-1,$e->getMessage());
+        }
+    }
+
+    public function play_cards() {
+        // 获取参数
+        $token=$this->param('token','');
+        $rmid=$this->param('rmid','');
+        $cards=$this->param('cards','');
+        try {
+            // 获取信息
+            $Players=new Players();
+            return json(1,'已出牌',$Players->playCards($token,$rmid,$cards));
         } catch (Exception $e) {
             return json(-1,$e->getMessage());
         }

@@ -5,6 +5,7 @@ namespace app\playing_cards\model;
 use base\Model;
 use AdminService\Exception;
 use AdminService\model\Token;
+use AdminService\model\User;
 use app\playing_cards\model\Players;
 
 class Room extends Model {
@@ -122,55 +123,143 @@ class Room extends Model {
         $user_info=$Token->getTokenInfo($token);
         // 通过$room_uuid获取房间信息
         $room_info=$this->getRoomInfo($room_uuid);
-        // 判断房间是否已经结束
-        if($room_info['status']===3)
-            throw new Exception('房间已结束');
         // 判断房间是否已经封存
-        if($room_info['status']===4)
+        if($room_info['status']===3)
             throw new Exception('房间已封存');
-        // 判断房间是否还在准备中
-        if($room_info['status']===0) {
-            // 判断房间玩家是否已经到齐
-            if($room_info['vacancy']===0) {
-                // 房间玩家已经到齐,则开始游戏
-                $this->startGame($room_uuid);
-                // 重新获取房间信息
-                $room_info=$this->getRoomInfo($room_uuid);
-            }
-        }
+        // 判断房间是否已经流局
+        if($room_info['status']===4)
+            throw new Exception('房间已流局');
+        // 先更新房间信息
+        $this->roomUpdateEvent($room_info);
+        // 重新获取房间信息
+        $room_info=$this->getRoomInfo($room_uuid);
         $is_in_room=false;
+        $return_data['players']=array();
         foreach($room_info['players'] as $key=>$value) {
-            $return_data['players']=array();
+            // 通过玩家uuid获取玩家信息
+            $User=new User();
+            $user_info_temp=$User->getUserInfoByUUID($value['uuid']);
+            $value['nickname']=$user_info_temp['nickname'];
             $return_data['players'][$key]=array(
                 'nickname'=>$value['nickname'],
                 'serial'=>$value['serial'],
                 'status'=>$value['status'],
                 'cards_count'=>$value['cards_count'],
-                'cards_played'=>$value['cards_played'],
+                'cards_played'=>($value['cards_played']==='pass'?['pass']:str_split($value['cards_played']??'',2)),
             );
             // 公开房间需要匿名玩家的信息
             if($room_info['public']==1)
                 $return_data['players'][$key]['nickname']='';
             // 如果是自己,则返回自己的信息
-            if($value['uuid']==$user_info['uuid']) {
+            if($value['uuid']===$user_info['uuid']) {
                 $return_data['players'][$key]['nickname']=$value['nickname'];
-                $return_data['players'][$key]['cards']=$value['cards'];
+                $return_data['players'][$key]['cards']=($value['cards']==='pass'?['pass']:str_split($value['cards']??'',2));
+                // 同时需要记录自己的座位号
+                $return_data['serial']=$value['serial'];
                 $is_in_room=true;
             }
+            // 如果进入结算阶段,则需要返回其他玩家的手牌
+            if($room_info['status']===2)
+                $return_data['players'][$key]['cards']=($value['cards']==='pass'?['pass']:str_split($value['cards']??'',2));
         }
         if(!$is_in_room)
             throw new Exception('用户不在房间中');
         // 刷新房间更新时间
         $this->where('rmid',$room_uuid)->update(array('update_time'=>time()));
+        // 刷新玩家更新时间
+        $Player=new Players();
+        $Player->where('uuid',$user_info['uuid'])->where('rmid',$room_uuid)->update(array('update_time'=>time()));
         // 返回结果
-        $return_data=array(
+        $return_data_temp=array(
             'status'=>$room_info['status'],
             'timeout'=>$room_info['timeouts']-time()-1,
             'current_player'=>$room_info['current_player'],
             'previous_player'=>$room_info['previous_player']
         );
+        // 如果timeout小于0,则显示为0
+        if($return_data_temp['timeout']<0)
+            $return_data_temp['timeout']=0;
+        // 合并数组
+        $return_data=array_merge($return_data,$return_data_temp);
         return $return_data;
     }
+
+    /**
+     * 房间更新事件
+     * 
+     * @access private
+     * @param array $room_info 房间信息
+     * @return void
+     * @throws Exception
+     */
+    private function roomUpdateEvent(array $room_info): void {
+        // 判断房间状态
+        switch($room_info['status']) {
+            case 0:
+                // 准备中
+                // 将30秒内无心跳的玩家踢出房间
+                $Player=new Players();
+                $timeout_list=$Player->where('rmid',$room_info['rmid'])->where('update_time','<',time()-30)->select();
+                // 删除对应的玩家并恢复房间空位
+                foreach($timeout_list as $value) {
+                    $Player->where('uuid',$value['uuid'])->where('rmid',$room_info['rmid'])->delete();
+                    $vacancy=$room_info['vacancy']+1;
+                    $this->where('rmid',$room_info['rmid'])->update(array('vacancy'=>$vacancy));
+                }
+                // 判断房间玩家是否已经到齐,房间玩家到齐,则开始游戏
+                if($room_info['vacancy']===0)
+                    $this->startGame($room_info['rmid']);
+                break;
+            case 1:
+                // 游戏中
+                // 设置心跳超时的玩家为离线状态
+                $Player=new Players();
+                $Player->where('rmid',$room_info['rmid'])->where('update_time','<',time()-60)->update(array('status'=>1));
+                // 判断当前出牌的玩家是否已经超时(离线状态,已经完成的玩家和没有手牌的玩家默认为超时)
+                $current_player_info=$Player->where('rmid',$room_info['rmid'])->where('serial',$room_info['current_player'])->find();
+                if($current_player_info['status']!==0||$room_info['timeouts']<time()||$current_player_info['cards_count']===0) {
+                    // 判断是否允许pass
+                    $cards='';
+                    if($room_info['previous_player']===$current_player_info['serial']&&$current_player_info['cards_count']>0) {
+                        // 判断手牌中是否有方块4(AA),如果有则打出,否则打出手牌最开始的一张
+                        $cards_array=str_split($current_player_info['cards'],2);
+                        if(in_array('AA',$cards_array)) {
+                            $cards='AA';
+                            $cards_array=array_diff($cards_array,['AA']);
+                        } else {
+                            $cards=$cards_array[0];
+                            $cards_array=array_diff($cards_array,[$cards]);
+                        }
+                        // 将数组转换为字符串
+                        $$current_player_info['cards']=implode('',$cards_array);
+                    } else
+                        $cards='pass';
+                     // 记录玩家出牌
+                    $Player->where('uuid',$current_player_info['uuid'])->where('rmid',$room_info['rmid'])->update(array(
+                        'cards'=>$current_player_info['cards'],
+                        'cards_played'=>$cards,
+                        'cards_count'=>$current_player_info['cards']/2
+                    ));
+                    // 记录房间出牌信息(如果玩家出的牌不是pass则记录)
+                    if($cards!=='pass')
+                        $this->where('rmid',$room_info['rmid'])->update(array(
+                            'previous_player'=>$current_player_info['serial'],
+                            'previous_cards'=>$cards
+                        ));
+                    // 更新到下一个玩家
+                    $this->where('rmid',$room_info['rmid'])->update(array(
+                        'current_player'=>($current_player_info['serial']<$room_info['max_player']?$current_player_info['serial']+1:1),
+                        'timeouts'=>time()+61,
+                        'update_time'=>time()
+                    ));
+                }
+                break;
+            case 2:
+                // 结算中
+                break;
+        }
+    }
+
 
     /**
      * 游戏开始
@@ -185,24 +274,27 @@ class Room extends Model {
         $this->where('rmid',$room_uuid)->update(array('status'=>1));
         // 重置玩家序号,重新分配序号(座位号)
         $Player=new Players();
-        $players=$Player->where('room_uuid',$room_uuid)->select();
+        $players=$Player->where('rmid',$room_uuid)->select();
         $serial=1;
         foreach($players as $value) {
             $Player->where('uuid',$value['uuid'])->where('rmid',$room_uuid)->update(array('serial'=>$serial));
             $serial++;
         }
         // 重置玩家状态
-        $Player->where('room_uuid',$room_uuid)->update(array('status'=>0));
+        $Player->where('rmid',$room_uuid)->update(array('status'=>0));
         // 重置玩家上一次出牌信息
-        $Player->where('room_uuid',$room_uuid)->update(array('cards_played'=>''));
+        $Player->where('rmid',$room_uuid)->update(array('cards_played'=>''));
         // 发牌
         $this->dealCards($room_uuid);
+        // 重置当前房间出牌超时时间
+        $this->where('rmid',$room_uuid)->update(array('timeouts'=>time()+61));
     }
 
     /**
      * 发牌
      * 
      * @access private
+     * @
      * @param string $room_uuid 房间ID
      * @return void
      */
@@ -210,7 +302,7 @@ class Room extends Model {
         // 在这里实现发牌
         $char=str_split("ABCDEFGHIJKLM");
         $pokerlist=array();
-        for ($i=0;$i<4;$i++) { 
+        for($i=0;$i<4;$i++) { 
             for ($j=0;$j<13;$j++) { 
                 array_push($pokerlist,$char[$i].$char[$j]);
             }
@@ -224,7 +316,7 @@ class Room extends Model {
             array("poker"=>"","group"=>0,"firstplay"=>false),
             array("poker"=>"","group"=>0,"firstplay"=>false)
         );
-        for ($i=0;$i<13;$i++) { 
+        for($i=0;$i<13;$i++) { 
             for ($j=0;$j<4;$j++) { 
                 $poker=array_pop($pokerlist);
                 if($poker==="AA"){//方块四
@@ -251,7 +343,7 @@ class Room extends Model {
                 'update_time'=>time()
             ));
             // 如果该玩家持有方块4,则将其设置为当前玩家
-            if($pokergroup[$n]["firstplayer"])
+            if($pokergroup[$n]["firstplay"])
                 $this->where('rmid',$room_uuid)->update(array(
                     'current_player'=>$value['serial'],
                     'previous_player'=>$value['serial'],
