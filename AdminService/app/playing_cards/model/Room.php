@@ -212,9 +212,9 @@ class Room extends Model {
                 break;
             case 1:
                 // 游戏中
-                // 设置心跳超时的玩家为离线状态
+                // 设置心跳超时的游戏中的玩家为离线状态
                 $Player=new Players();
-                $Player->where('rmid',$room_info['rmid'])->where('update_time','<',time()-60)->update(array('status'=>1));
+                $Player->where('rmid',$room_info['rmid'])->where('status',0)->where('update_time','<',time()-60)->update(array('status'=>1));
                 // 判断当前出牌的玩家是否已经超时(离线状态,已经完成的玩家和没有手牌的玩家默认为超时)
                 $current_player_info=$Player->where('rmid',$room_info['rmid'])->where('serial',$room_info['current_player'])->find();
                 if($current_player_info['status']!==0||$room_info['timeouts']<time()||$current_player_info['cards_count']===0) {
