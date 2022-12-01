@@ -158,13 +158,35 @@ class Players extends Model {
             $player_info['cards'],$cards,
             ($room_info['previous_player']===$player_info['serial']?null:$room_info['previous_cards'])
         );
+        $this->playCardsEvent($Room,$room_info,$player_info,$room_uuid,$uuid,$surplus_cards,$cards);
+        return true;
+    }
+
+    /**
+     * 出牌触发事件
+     * 
+     * @access public
+     * @param Room $Room 房间模型
+     * @param array $room_info 房间信息
+     * @param array $player_info 玩家信息
+     * @param string $room_uuid 房间UUID
+     * @param string $uuid 玩家UUID
+     * @param array $surplus_cards 剩余牌信息
+     * @param string $cards 出牌
+     * @param bool $is_pass 是否更新玩家状态
+     * @return void
+     * @throws Exception
+     */
+    public function playCardsEvent(Room $Room,array $room_info,array $player_info,string $room_uuid,string $uuid,array $surplus_cards,string $cards,bool $is_pass=true) {
         // 记录玩家出牌
-        $this->where('uuid',$uuid)->where('rmid',$room_uuid)->update(array(
+        $data=array(
             'cards'=>$surplus_cards['cards'],
-            'update_time'=>time(),
             'cards_played'=>$cards,
             'cards_count'=>$surplus_cards['cards_count']
-        ));
+        );
+        if($is_pass)
+            $data['update_time']=time();
+        $this->where('uuid',$uuid)->where('rmid',$room_uuid)->update($data);
         // 记录房间出牌信息(如果玩家出的牌不是pass则记录)
         if($cards!=='pass')
             $Room->where('rmid',$room_uuid)->update(array(
@@ -178,10 +200,61 @@ class Players extends Model {
             'update_time'=>time()
         ));
         // 判断玩家是否已经出完牌
-        if($surplus_cards['cards_count']===0) {
+        if($surplus_cards['cards_count']<=0) {
             // 当前玩家出完牌的事件
+            // 记录排名
+            $ranking=empty($room_info['ranking'])?$player_info['serial']:($room_info['ranking'].$player_info['serial']);
+            $Room->where('rmid',$room_uuid)->update(array(
+                'ranking'=>$ranking,
+                'update_time'=>time()
+            ));
+            // 更改当前玩家状态为2(已完成游戏),前提是当前玩家在线
+            $this->where('uuid',$uuid)->where('rmid',$room_uuid)->where('status',0)->update(array(
+                'status'=>2,
+                'update_time'=>time()
+            ));
+            $ranking=str_split($ranking);
+            // 判断牌局是否结束
+            if($this->isOver($room_uuid,$ranking)) {
+                // 变更房间状态为2(结算中)
+                $Room->where('rmid',$room_uuid)->where('status','1')->update(array(
+                    'status'=>2,
+                    'update_time'=>time()
+                ));
+                // 更改所有玩家状态为2(已完成游戏),前提是当前玩家在线
+                $this->where('rmid',$room_uuid)->where('status',0)->update(array(
+                    'status'=>2,
+                    'update_time'=>time()
+                ));
+            }
         }
-        return true;
+    }
+
+   /**
+     * 判断牌局是否结束
+     * 
+     * @access private
+     * @param string $room_uuid 房间UUID
+     * @param array $ranking 排名
+     * @return bool
+     * @throws Exception
+     */
+    private function isOver(string $room_uuid,array $ranking): bool {
+        // 获取玩家信息
+        $player_info=$this->where('rmid',$room_uuid)->where('group',1)->select(array('serial','group'));
+        $spade =0;
+        $count =count($ranking);
+        foreach ($player_info as $value){
+        for($i=0;$i<$count;$i++){
+            if($value["serial"] === $ranking[$i])
+                $spade +=1;
+            break;
+        }
+        }
+        if($count=$spade) return true;
+        elseif($spade ==2) return true;
+        elseif(($count -$spade )==2) return true;
+        return false;
     }
 
     /**
@@ -287,12 +360,9 @@ class Players extends Model {
      * @param array $play_poker 打出的牌
      * @return array
      */
-    private function getLeftOverPoker($own_poker,$play_poker) {
+    private function getLeftOverPoker(array $own_poker,array $play_poker) {
         $new_poker=array_diff($own_poker,$play_poker);
-        $arr=array();
-        foreach($new_poker as $value)
-            array_push($arr,$value);
-        $surplus_cards =implode($arr);
+        $surplus_cards=implode($new_poker);
         $surplus_cards_count=strlen($surplus_cards)/2;
         // 返回玩家剩余手牌
         return array(

@@ -160,8 +160,12 @@ class Room extends Model {
                 $is_in_room=true;
             }
             // 如果进入结算阶段,则需要返回其他玩家的手牌
-            if($room_info['status']===2)
+            if($room_info['status']===2) {
+                // 手牌
                 $return_data['players'][$key]['cards']=($value['cards']==='pass'?['pass']:str_split($value['cards']??'',2));
+                // 分组
+                $return_data['players'][$key]['group']=$value['group'];
+            }
         }
         if(!$is_in_room)
             throw new Exception('用户不在房间中');
@@ -176,11 +180,14 @@ class Room extends Model {
             'status'=>0,
         ));
         // 返回结果
+        $ranking=empty($room_info['ranking'])?'':$room_info['ranking'];
+        $ranking=str_split($ranking);
         $return_data_temp=array(
             'status'=>$room_info['status'],
             'timeout'=>$room_info['timeouts']-time()-1,
             'current_player'=>$room_info['current_player'],
-            'previous_player'=>$room_info['previous_player']
+            'previous_player'=>$room_info['previous_player'],
+            'ranking'=>$ranking
         );
         // 如果timeout小于0,则显示为0
         if($return_data_temp['timeout']<0)
@@ -252,24 +259,11 @@ class Room extends Model {
                         $current_player_info['cards']=implode('',$cards_array);
                     } else
                         $cards='pass';
-                    // 记录玩家出牌
-                    $Player->where('uuid',$current_player_info['uuid'])->where('rmid',$room_info['rmid'])->update(array(
+                    $surplus_cards=array(
                         'cards'=>$current_player_info['cards'],
-                        'cards_played'=>$cards,
                         'cards_count'=>strlen($current_player_info['cards'])/2
-                    ));
-                    // 记录房间出牌信息(如果玩家出的牌不是pass则记录)
-                    if($cards!=='pass')
-                        $this->where('rmid',$room_info['rmid'])->update(array(
-                            'previous_player'=>$current_player_info['serial'],
-                            'previous_cards'=>$cards
-                        ));
-                    // 更新到下一个玩家
-                    $this->where('rmid',$room_info['rmid'])->update(array(
-                        'current_player'=>($current_player_info['serial']<$room_info['max_player'])?($current_player_info['serial']+1):1,
-                        'timeouts'=>time()+61,
-                        'update_time'=>time()
-                    ));
+                    );
+                    $Player->playCardsEvent($this,$room_info,$current_player_info,$room_info['rmid'],$current_player_info['uuid'],$surplus_cards,$cards,false);
                 }
                 break;
             case 2:
