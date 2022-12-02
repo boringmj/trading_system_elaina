@@ -79,8 +79,10 @@ class Players extends Model {
         $Room=new Room();
         $room_info=$Room->getRoomInfo($room_uuid);
         // 判断房间是否已经开始
-        if($room_info['status']!=0)
+        if($room_info['status']===1)
             throw new Exception('房间已经开始');
+        if($room_info['status']>=2)
+            return $room_info;
         // 离开房间
         $this->where('uuid',$uuid)->where('rmid',$room_uuid)->delete();
         // 增加房间剩余座位
@@ -200,7 +202,7 @@ class Players extends Model {
             'update_time'=>time()
         ));
         // 判断玩家是否已经出完牌
-        if($surplus_cards['cards_count']<=0) {
+        if($surplus_cards['cards_count']<=0&&$cards!=='pass') {
             // 当前玩家出完牌的事件
             // 记录排名
             $ranking=empty($room_info['ranking'])?$player_info['serial']:($room_info['ranking'].$player_info['serial']);
@@ -242,18 +244,17 @@ class Players extends Model {
     private function isOver(string $room_uuid,array $ranking): bool {
         // 获取玩家信息
         $player_info=$this->where('rmid',$room_uuid)->where('group',1)->select(array('serial','group'));
-        $spade =0;
-        $count =count($ranking);
-        foreach ($player_info as $value){
-        for($i=0;$i<$count;$i++){
-            if($value["serial"] === $ranking[$i])
-                $spade +=1;
-            break;
+        $spade=0;
+        $count=count($ranking);
+        foreach ($player_info as $value) {
+            for($i=0;$i<$count;$i++) {
+                if($value["serial"]===(int)$ranking[$i])
+                    $spade+=1;
+                break;
+            }
         }
-        }
-        if($count=$spade) return true;
-        elseif($spade ==2) return true;
-        elseif(($count -$spade )==2) return true;
+        if(count($player_info) == $spade ) return true;
+        elseif(($count -$spade ) ==2 ) return true;
         return false;
     }
 

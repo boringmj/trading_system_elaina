@@ -100,6 +100,18 @@ class Index extends Controller {
         }
     }
 
+    // 监控接口
+    public function monitor() {
+        try {
+            // 获取信息
+            $Room=new Room();
+            $Room->monitor();
+            return json(1,'ok');
+        } catch (Exception $e) {
+            return json(-1,$e->getMessage());
+        }
+    } 
+
 }
 
 ?>
