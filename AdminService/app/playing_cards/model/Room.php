@@ -149,7 +149,7 @@ class Room extends Model {
                 'cards_played'=>($value['cards_played']==='pass'?['pass']:str_split($value['cards_played']??'',2)),
             );
             // 公开房间需要匿名玩家的信息
-            if($room_info['public']==1)
+            if($room_info['public']==1&&$room_info['status']!=0) {
                 $return_data['players'][$key]['nickname']='';
             // 如果是自己,则返回自己的信息
             if($value['uuid']===$user_info['uuid']) {
