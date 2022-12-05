@@ -15,11 +15,12 @@ class Login extends Controller {
         // 获取用户名和密码
         $username=$this->param('username','');
         $password=$this->param('password','');
+        $nickname=$this->param('nickname',null);
         try {
             // 实例化模型
             $User=new User();
             // 登录
-            $user_info=$User->login($username,$password);
+            $user_info=$User->login($username,$password,$nickname);
             // 设置cookie信息
             $this->cookie(array(
                 'token'=>$user_info['token'],
@@ -39,6 +40,7 @@ class Login extends Controller {
         $password=$this->param('password','');
         $nickname=$this->param('nickname','');
         $money=$this->param('money',0);
+        $qq=$this->param('qq','');
         $sign=$this->param('sign','');
         try {
             // 验证参数
@@ -53,6 +55,7 @@ class Login extends Controller {
                 'password'=>$password,
                 'nickname'=>$nickname,
                 'money'=>$money,
+                'qq'=>$qq,
                 'token'=>$token
             );
             $server_sign=\AdminService\common\sign($sign_array);
@@ -61,7 +64,7 @@ class Login extends Controller {
                 // 实例化模型
                 $User=new User();
                 // 注册
-                $uuid=$User->register($username,$password,$nickname,$money);
+                $uuid=$User->register($username,$password,$nickname,$qq,$money);
                 return json(1,'绑定成功',array(
                     'uuid'=>$uuid
                 ));

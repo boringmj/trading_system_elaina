@@ -32,10 +32,11 @@ class User extends Model {
      * @access public
      * @param string $username 用户名
      * @param string $password 密码
+     * @param string $nickname 昵称
      * @return array
      * @throws Exception
      */
-    public function login(string $username,string $password): array {
+    public function login(string $username,string $password,?string $nickname): array {
         // 处理用户登录
         $password=$this->encryptPassword($password);
         $user_info=$this->where('username',$username)->where('password',$password)->find(array('uuid','status'));
@@ -44,6 +45,12 @@ class User extends Model {
         if($user_info['status']!==1)
             throw new Exception("用户状态异常");
         $uuid=$user_info['uuid'];
+        // 更新用户信息
+        if($nickname!==null) {
+            $this->where('uuid',$uuid)->update(array(
+                'nickname'=>$nickname
+            ));
+        }
         // 生成令牌
         $Token=new Token();
         $token=$Token->createToken($uuid);
@@ -60,11 +67,12 @@ class User extends Model {
      * @param string $username 用户名
      * @param string $password 密码
      * @param string $nickname 昵称
+     * @param string $qq QQ号
      * @param string $money 余额
      * @return array
      * @throws Exception
      */
-    public function register(string $username,string $password,string $nickname='',int $money=0): string {
+    public function register(string $username,string $password,string $nickname='',string $qq='',int $money=0): string {
         // 处理用户注册
         $password=$this->encryptPassword($password);
         // 生成UUID
@@ -79,6 +87,7 @@ class User extends Model {
             'password'=>$password,
             'uuid'=>$uuid,
             'nickname'=>$nickname,
+            'qq'=>$qq,
             'money'=>$money,
             'create_time'=>time()
         ));
