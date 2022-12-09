@@ -248,9 +248,10 @@ class Players extends Model {
         $count=count($ranking);
         foreach ($player_info as $value) {
             for($i=0;$i<$count;$i++) {
-                if($value["serial"]===(int)$ranking[$i])
+                if($value["serial"]===(int)$ranking[$i]) {
                     $spade+=1;
-                break;
+                    break;
+                }
             }
         }
         if(count($player_info) == $spade ) return true;
@@ -289,7 +290,7 @@ class Players extends Model {
             //开始判断顺子
             $sz_str="JIHGFEDCBA";//顺子的顺序456789 10 J Q K
             $number_str=implode("",$number);//组合成字符串,待会直接比较
-            $start_pos=strpos($sz_str,$number[0]);
+            $start_pos=strpos($sz_str,$number_str);
             $sz=true;
             if(!$start_pos){//最大的牌的牌不在这个队列,不是顺子
                 $sz=false;
@@ -419,7 +420,7 @@ class Players extends Model {
             return $this->getLeftOverPoker($own_poker,$play_poker);
         }
         //类型不等且小于5,不符合出牌规则
-        if($current_info['type']!=$previous_info['type']&&$previous_info['type']<5)
+        if($current_info['type']!=$previous_info['type']&&($previous_info['type']<5 || $current_info['type'] < 5 ))
             throw new Exception('和上家的牌型不一致');
         // 定义一个flags
         switch($current_info['type']) {

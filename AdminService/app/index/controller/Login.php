@@ -27,7 +27,7 @@ class Login extends Controller {
                 'uuid'=>$user_info['uuid']
             ));
             return json(1,'登录成功',array(
-                'token'=>$user_info['token'],'uuid'=>$user_info['uuid']
+                'token'=>$user_info['token'],'uuid'=>$user_info['uuid'],'money'=>$user_info['money']
             ));
         } catch(Exception $e) {
             return json(-1,$e->getMessage());
@@ -40,8 +40,8 @@ class Login extends Controller {
         $password=$this->param('password','');
         $nickname=$this->param('nickname','');
         $money=$this->param('money',0);
-        $qq=$this->param('qq','');
         $sign=$this->param('sign','');
+        $qq=$this->param('qq','');
         try {
             // 验证参数
             if(!preg_match(Config::get('app.config.all.user.register.rule.username'),$username))

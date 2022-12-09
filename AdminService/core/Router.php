@@ -74,7 +74,6 @@ final class Router extends BaseRouter {
                 'app'=>$route_info['app'],
                 'path'=>$controller_path
             ));
-            
     }
 
     /**
