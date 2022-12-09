@@ -5,6 +5,7 @@ namespace app\playing_cards\model;
 use base\Model;
 use AdminService\Exception;
 use AdminService\model\Token;
+use AdminService\App;
 use app\playing_cards\model\Room;
 
 class Players extends Model {
@@ -282,17 +283,26 @@ class Players extends Model {
             $number=array();
             $flower=array();
             for ($i=0; $i<$poker_len; $i++) { 
-                array_push($flower,$poker[$i][1]);
+                array_push($flower,$poker[$i][0]);
                 array_push($number,$poker[$i][1]);
             }
             arsort($number);
             arsort($flower);
             //开始判断顺子
+            //"AJAIAHAGAFAEADACAB"
             $sz_str="JIHGFEDCBA";//顺子的顺序456789 10 J Q K
             $number_str=implode("",$number);//组合成字符串,待会直接比较
             $start_pos=strpos($sz_str,$number_str);
             $sz=true;
-            if(!$start_pos){//最大的牌的牌不在这个队列,不是顺子
+            if($start_pos === false){//最大的牌的牌不在这个队列,不是顺子
+                App::get('Log')->write(
+                    'Error({error_code}): {message} | data: {data}',
+                    array(
+                        'message'=>"顺子",
+                        'error_code'=>-1,
+                        'data'=>$number_str.$sz_str
+                    )
+                );
                 $sz=false;
             }else{
                 if($number_str != substr($sz_str,$start_pos,5)){
