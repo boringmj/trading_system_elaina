@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS `trading_system_elaina_user` (
   `password` varchar(32) NOT NULL,
   `nickname` varchar(36) NOT NULL DEFAULT '',
   `status` int(1) NOT NULL DEFAULT '1',
-  `money` int(10) NOT NULL DEFAULT '0',
+  `money` float(10,2) NOT NULL DEFAULT '0',
   `qq` varchar(20) NOT NULL DEFAULT '',
   `create_time` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
