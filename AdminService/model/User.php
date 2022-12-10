@@ -111,4 +111,23 @@ class User extends Model {
         return $user_info;
     }
 
+    /**
+     * 获取用户余额
+     * 
+     * @access public
+     * @param string $uuid 用户ID
+     * @return float
+     */
+    public function getMoney(string $uuid): float {
+        // 检查用户真实性(防止伪造用户uuid)
+        if(Config::get('app.config.all.user.check',false)) {
+            if(empty($this->getUserInfoByUUID($uuid)))
+                throw new Exception("用户不存在");
+        }
+        $user_info=$this->where('uuid',$uuid)->find(array('money'));
+        if(empty($user_info))
+            return 0;
+        return $user_info['money'];
+    }
+
 }

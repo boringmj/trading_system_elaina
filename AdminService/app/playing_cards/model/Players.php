@@ -3,9 +3,9 @@
 namespace app\playing_cards\model;
 
 use base\Model;
+use AdminService\App;
 use AdminService\Exception;
 use AdminService\model\Token;
-use AdminService\App;
 use app\playing_cards\model\Room;
 
 class Players extends Model {

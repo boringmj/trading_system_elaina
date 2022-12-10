@@ -16,9 +16,9 @@ return array(
             'rule'=>array(
                 'username'=>'/^[a-zA-Z0-9_]{4,36}$/', // 用户名规则
                 'password'=>'/^.{6,36}$/' // 密码规则
-            ),
-            'bind_token'=>'dGwCERvJ1zis&!-JdxZww#A7EI@jS3op' // 绑定用户使用的令牌
-        )
+            )
+        ),
+        'key'=>'dGwCERvJ1zis&!-JdxZww#A7EI@jS3op' // 系统调用接口的密钥
     )
 );
 
