@@ -3,6 +3,7 @@
 namespace AdminService\model;
 
 use base\Model;
+use AdminService\App;
 use AdminService\Exception;
 use AdminService\model\User;
 
@@ -87,4 +88,63 @@ class Money extends Model {
         $this->transferByUuid($uuid,$from_uuid,$money,$remark);
     }
 
+    /**
+     * 通过来源回滚所有用户余额到某个时间点
+     * 
+     * @access public
+     * @param string $from_uuid 来源用户ID
+     * @param int $time 时间戳
+     * @return void
+     * @throws Exception
+     */
+    public function rollbackByFromUuid(string $from_uuid,int $time) {
+        // 获取用户信息
+        $User=new User();
+        $user_money_from=$User->getMoney($from_uuid);
+        // 获取所有交易记录
+        $money_list=$this->where('from_uuid',$from_uuid)->where('create_time',$time,'>=')->select();
+        // 回滚用户余额(事务处理)
+        $User->beginTransaction();
+        $this->beginTransaction();
+        App::get('Log')->write('发生回滚事件-{name} | 来源: {from}, 时间: {time}, 至: {to_time}',array(
+            'name'=>'转账回滚',
+            'from'=>$from_uuid,
+            'time'=>date('Y-m-d H:i:s'),
+            'to_time'=>date('Y-m-d H:i:s',$time)
+        ));
+        try {
+            foreach($money_list as $money) {
+                $user_money_to=$User->getMoney($money['uuid']);
+                $User->where('uuid',$money['uuid'])->update(array(
+                    'money'=>$user_money_to-$money['money']
+                ));
+                $User->where('uuid',$from_uuid)->update(array(
+                    'money'=>$user_money_from+$money['money']
+                ));
+                // 新增一条回滚记录
+                $this->insert(array(
+                    'uuid'=>$money['uuid'],
+                    'from_uuid'=>$from_uuid,
+                    'money'=>-$money['money'],
+                    'remark'=>'余额回滚',
+                    'create_time'=>time()
+                ));
+                App::get('Log')->write('回滚成功-{name} | 来源: {from}, 目标: {to}, 金额: {money}',array(
+                    'name'=>'转账回滚',
+                    'from'=>$from_uuid,
+                    'to'=>$money['uuid'],
+                    'money'=>$money['money']
+                ));
+            }
+            $User->commit();
+            $this->commit();
+        } catch(Exception $e) {
+            App::get('Log')->write('回滚失败-{error}',array(
+                'error'=>$e->getMessage()
+            ));
+            $User->rollback();
+            $this->rollback();
+            throw $e;
+        }
+    }
 }
