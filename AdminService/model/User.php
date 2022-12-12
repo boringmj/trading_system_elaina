@@ -117,6 +117,7 @@ class User extends Model {
      * @access public
      * @param string $uuid 用户ID
      * @return float
+     * @throws Exception
      */
     public function getMoney(string $uuid): float {
         // 检查用户真实性(防止伪造用户uuid)
@@ -126,7 +127,22 @@ class User extends Model {
         }
         $user_info=$this->where('uuid',$uuid)->find(array('money'));
         if(empty($user_info))
-            return 0;
+            throw new Exception("用户不存在");
+        return $user_info['money'];
+    }
+
+    /**
+     * 通过qq获取用户余额
+     * 
+     * @access public
+     * @param string $qq 用户qq
+     * @return float
+     * @throws Exception
+     */
+    public function getMoneyByQq(string $qq): float {
+        $user_info=$this->where('qq',$qq)->find(array('money'));
+        if(empty($user_info))
+            throw new Exception("用户不存在");
         return $user_info['money'];
     }
 

@@ -61,4 +61,30 @@ class Money extends Model {
         }
     }
 
+    /**
+     * 通过qq为用户转入一笔交易记录
+     * 
+     * @access public
+     * @param string $qq 用户qq
+     * @param string $from_qq 来源用户qq
+     * @param float $money 交易金额
+     * @param string $remark 交易备注
+     * @return void
+     * @throws Exception
+     */
+    public function transferByQq(string $qq,string $from_qq,float $money,string $remark='') {
+        // 获取用户的qq号
+        $User=new User();
+        $uuid=$User->where('qq',$qq)->find('uuid');
+        $from_uuid=$User->where('qq',$from_qq)->find('uuid');
+        // 验证用户是否存在
+        if(empty($uuid)||empty($from_uuid))
+            throw new Exception("用户不存在",0,array(
+                'qq'=>$qq,
+                'from_qq'=>$from_qq
+            ));
+        // 转入交易记录
+        $this->transferByUuid($uuid,$from_uuid,$money,$remark);
+    }
+
 }
