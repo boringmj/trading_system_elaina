@@ -121,6 +121,7 @@ class Money extends Model {
                 $User->where('uuid',$from_uuid)->update(array(
                     'money'=>$user_money_from+$money['money']
                 ));
+                $user_money_from+=$money['money'];
                 // 新增一条回滚记录
                 $this->insert(array(
                     'uuid'=>$money['uuid'],
