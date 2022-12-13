@@ -83,7 +83,9 @@ class Money extends Controller {
         $Money=new MoneyModel();
         $date="2022-12-12 00:00:00";
         $timestamp=strtotime($date);
-        $Money->rollbackByFromUuid('63969c0a-c237-3031-707e-98e8791e1111',$timestamp);
+        //$Money->rollbackByFromUuid('63969c0a-c237-3031-707e-98e8791e1111',$timestamp);
+        $Money->rollbackByRemark('存钱',$timestamp);
+        $Money->rollbackByRemark('取钱',$timestamp);
         return json(1,'success');
     }
 

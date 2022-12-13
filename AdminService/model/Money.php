@@ -107,7 +107,7 @@ class Money extends Model {
         $User->beginTransaction();
         $this->beginTransaction();
         App::get('Log')->write('发生回滚事件-{name} | 来源: {from}, 时间: {time}, 至: {to_time}',array(
-            'name'=>'转账回滚',
+            'name'=>'转账回滚-来源',
             'from'=>$from_uuid,
             'time'=>date('Y-m-d H:i:s'),
             'to_time'=>date('Y-m-d H:i:s',$time)
@@ -127,12 +127,71 @@ class Money extends Model {
                     'uuid'=>$money['uuid'],
                     'from_uuid'=>$from_uuid,
                     'money'=>-$money['money'],
-                    'remark'=>'余额回滚',
+                    'remark'=>'余额回滚-01',
                     'create_time'=>time()
                 ));
                 App::get('Log')->write('回滚成功-{name} | 来源: {from}, 目标: {to}, 金额: {money}',array(
                     'name'=>'转账回滚',
                     'from'=>$from_uuid,
+                    'to'=>$money['uuid'],
+                    'money'=>$money['money']
+                ));
+            }
+            $User->commit();
+            $this->commit();
+        } catch(Exception $e) {
+            App::get('Log')->write('回滚失败-{error}',array(
+                'error'=>$e->getMessage()
+            ));
+            $User->rollback();
+            $this->rollback();
+            throw $e;
+        }
+    }
+
+    /**
+     * 通过备注回滚所有用户余额到某个时间点
+     * 
+     * @access public
+     * @param string $remark 备注
+     * @param int $time 时间戳
+     * @return void
+     * @throws Exception
+     */
+    public function rollbackByRemark(string $remark,int $time) {
+        // 获取所有交易记录
+        $money_list=$this->where('remark',$remark)->where('create_time',$time,'>=')->select();
+        // 回滚用户余额(事务处理)
+        $User=new User();
+        $User->beginTransaction();
+        $this->beginTransaction();
+        App::get('Log')->write('发生回滚事件-{name} | 备注: {remark}, 时间: {time}, 至: {to_time}',array(
+            'name'=>'转账回滚-备注',
+            'remark'=>$remark,
+            'time'=>date('Y-m-d H:i:s'),
+            'to_time'=>date('Y-m-d H:i:s',$time)
+        ));
+        try {
+            foreach($money_list as $money) {
+                $user_money_to=$User->getMoney($money['uuid']);
+                $user_money_from=$User->getMoney($money['from_uuid']);
+                $User->where('uuid',$money['uuid'])->update(array(
+                    'money'=>$user_money_to-$money['money']
+                ));
+                $User->where('uuid',$money['from_uuid'])->update(array(
+                    'money'=>$user_money_from+$money['money']
+                ));
+                // 新增一条回滚记录
+                $this->insert(array(
+                    'uuid'=>$money['uuid'],
+                    'from_uuid'=>$money['from_uuid'],
+                    'money'=>-$money['money'],
+                    'remark'=>'余额回滚-02',
+                    'create_time'=>time()
+                ));
+                App::get('Log')->write('回滚成功-{name} | 来源: {from}, 目标: {to}, 金额: {money}',array(
+                    'name'=>'转账回滚',
+                    'from'=>$money['from_uuid'],
                     'to'=>$money['uuid'],
                     'money'=>$money['money']
                 ));
