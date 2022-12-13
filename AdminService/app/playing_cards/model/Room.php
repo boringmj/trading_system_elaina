@@ -3,9 +3,10 @@
 namespace app\playing_cards\model;
 
 use base\Model;
+use AdminService\App;
 use AdminService\Exception;
-use AdminService\model\Token;
 use AdminService\model\User;
+use AdminService\model\Token;
 use app\playing_cards\model\Players;
 
 class Room extends Model {
@@ -371,10 +372,13 @@ class Room extends Model {
      * @throws Exception
      */
     public function monitor() {
+        App::get('Log')->write('房间监控器已启动');
         // 将状态为游戏中的房间设置为流局
         $this->where('status',1)->where('update_time',time()-600,'<')->update(array('status'=>4));
         // 将状态为结算中的房间设置为封存
         $this->where('status',2)->where('update_time',time()-600,'<')->update(array('status'=>3));
+        // 删除所有超时的私有房间
+        $this->where('public',0)->where('update_time',time()-600,'<')->delete();
     }
 
 }

@@ -49,7 +49,7 @@ class Login extends Controller {
             if(!preg_match(Config::get('app.config.all.user.register.rule.password'),$password))
                 throw new Exception("密码不合法");
             // 验证签名
-            $token=Config::get('app.config.all.user.register.bind_token');
+            $token=Config::get('app.config.all.user.key');
             $sign_array=array(
                 'username'=>$username,
                 'password'=>$password,

@@ -61,6 +61,32 @@ class User extends Model {
     }
 
     /**
+     * 通过qq登录
+     * @param string $qq
+     * @param string $password
+     * @return array
+     * @throws Exception
+     */
+    public function loginByQQ(string $qq,string $password): array {
+        // 处理用户登录
+        $password=$this->encryptPassword($password);
+        $user_info=$this->where('qq',$qq)->where('password',$password)->find(array('uuid','status','money'));
+        if(empty($user_info))
+            throw new Exception("用户名或密码错误");
+        if($user_info['status']!==1)
+            throw new Exception("用户状态异常");
+        $uuid=$user_info['uuid'];
+        // 生成令牌
+        $Token=new Token();
+        $token=$Token->createToken($uuid);
+        return array(
+            'uuid'=>$uuid,
+            'token'=>$token,
+            'money'=>$user_info['money']
+        );
+    }
+
+    /**
      * 用户注册
      * 
      * @access public
@@ -109,6 +135,41 @@ class User extends Model {
         if($user_info['status']!==1)
             throw new Exception("用户状态异常");
         return $user_info;
+    }
+
+    /**
+     * 获取用户余额
+     * 
+     * @access public
+     * @param string $uuid 用户ID
+     * @return float
+     * @throws Exception
+     */
+    public function getMoney(string $uuid): float {
+        // 检查用户真实性(防止伪造用户uuid)
+        if(Config::get('app.config.all.user.check',false)) {
+            if(empty($this->getUserInfoByUUID($uuid)))
+                throw new Exception("用户不存在");
+        }
+        $user_info=$this->where('uuid',$uuid)->find(array('money'));
+        if(empty($user_info))
+            throw new Exception("用户不存在");
+        return $user_info['money'];
+    }
+
+    /**
+     * 通过qq获取用户余额
+     * 
+     * @access public
+     * @param string $qq 用户qq
+     * @return float
+     * @throws Exception
+     */
+    public function getMoneyByQq(string $qq): float {
+        $user_info=$this->where('qq',$qq)->find(array('money'));
+        if(empty($user_info))
+            throw new Exception("用户不存在");
+        return $user_info['money'];
     }
 
 }
