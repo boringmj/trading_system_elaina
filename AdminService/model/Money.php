@@ -155,10 +155,11 @@ class Money extends Model {
      * @access public
      * @param string $remark 备注
      * @param int $time 时间戳
+     * @param string $remark_re 回滚备注
      * @return void
      * @throws Exception
      */
-    public function rollbackByRemark(string $remark,int $time) {
+    public function rollbackByRemark(string $remark,int $time,string $remark_re='余额回滚-02') {
         // 获取所有交易记录
         $money_list=$this->where('remark',$remark)->where('create_time',$time,'>=')->select();
         // 回滚用户余额(事务处理)
@@ -166,7 +167,7 @@ class Money extends Model {
         $User->beginTransaction();
         $this->beginTransaction();
         App::get('Log')->write('发生回滚事件-{name} | 备注: {remark}, 时间: {time}, 至: {to_time}',array(
-            'name'=>'转账回滚-备注',
+            'name'=>'转账回滚-事件回滚:'.$remark_re,
             'remark'=>$remark,
             'time'=>date('Y-m-d H:i:s'),
             'to_time'=>date('Y-m-d H:i:s',$time)
@@ -186,7 +187,7 @@ class Money extends Model {
                     'uuid'=>$money['uuid'],
                     'from_uuid'=>$money['from_uuid'],
                     'money'=>-$money['money'],
-                    'remark'=>'余额回滚-02',
+                    'remark'=>$remark_re,
                     'create_time'=>time()
                 ));
                 App::get('Log')->write('回滚成功-{name} | 来源: {from}, 目标: {to}, 金额: {money}',array(
