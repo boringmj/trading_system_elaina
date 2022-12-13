@@ -52,7 +52,7 @@ class View extends Controller {
                 $list.="
                     <tr>
                         <td>{$money['money']}</td>
-                        <td>{$money['remark']}</td>
+                        <td>".htmlspecialchars($money['remark'])."</td>
                         <td>".date('Y-m-d H:i:s',$money['create_time'])."</td>
                         <td>转出</td>
                     </tr>
@@ -74,10 +74,16 @@ class View extends Controller {
                     </tbody>
                 </table>
             ";
+            $money=0;
+            $diff_time=time()-$bank_info['save_date'];
+            if($diff_time>=604800&&$bank_info['save_date']!==null) {
+                // 计算利息
+                $money=((int)((($diff_time % 86400) * 0.005 ) * $bank_info['base_money'])) / 100;
+            }
             return view(array(
                 'title'=>'我的信息',
-                'username'=>$user_info['username'],
-                'nickname'=>$user_info['nickname'],
+                'username'=>htmlspecialchars($user_info['username']),
+                'nickname'=>htmlspecialchars($user_info['nickname']),
                 'money'=>$user_info['money'],
                 'bank_money'=>$bank_info['money'],
                 'bank_base_money'=>$bank_info['base_money'],
@@ -86,7 +92,8 @@ class View extends Controller {
                 'bank_save_date'=>$bank_info['save_date']?date('Y-m-d H:i:s',$bank_info['save_date']):'无',
                 'bank_take_date'=>$bank_info['take_date']?date('Y-m-d H:i:s',$bank_info['take_date']):'无',
                 'list'=>$list,
-                'event_money'=>$user_info['event_money']
+                'event_money'=>$user_info['event_money'],
+                'money'=>$money,
             ));
         } catch(Exception $e) {
             $this->header('Location','/index/view/login');
@@ -139,8 +146,8 @@ class View extends Controller {
                     $money=((int)((($diff_time % 86400) * 0.005 ) * $user['base_money'])) / 100;
                 }
                 $app.='<tr>';
-                $app.='<td>'.$user['qq'].'</td>';
-                $app.='<td>'.$user['nickname'].'</td>';
+                $app.='<td>'.htmlspecialchars($user['qq']).'</td>';
+                $app.='<td>'.htmlspecialchars($user['nickname']).'</td>';
                 $app.='<td>'.$user['money'].'</td>';
                 $app.='<td>'.$user['bank_money'].'</td>';
                 $app.='<td>'.$user['base_money'].'</td>';
