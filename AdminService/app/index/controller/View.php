@@ -162,9 +162,12 @@ class View extends Controller {
                 </tr>
             </thead>
             <tbody>'.$app.'</tbody>';
+        $User=new User();
+        $user_info=$User->getUserInfoByUUID('638a10e2-a1d4-2294-395b-7faa609b3005');
         return view(array(
             'title'=>'存取信息',
-            'app'=>$app
+            'app'=>$app,
+            'bank'=>$user_info['money']
         ));
     }
 
