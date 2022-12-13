@@ -148,4 +148,20 @@ class Money extends Model {
             throw $e;
         }
     }
+
+    /**
+     * 通过UUID查询用户所有交易记录
+     * 
+     * @access public
+     * @param string $uuid 用户ID
+     * @return array
+     */
+    public function getMoneyListByUuid(string $uuid) {
+        $money_to_list=$this->where('uuid',$uuid)->select();
+        $money_from_list=$this->where('from_uuid',$uuid)->select();
+        return array(
+            'to'=>$money_to_list,
+            'from'=>$money_from_list
+        );
+    }
 }
