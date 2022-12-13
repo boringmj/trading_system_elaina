@@ -148,7 +148,7 @@ class View extends Controller {
                 $app.='<tr>';
                 $app.='<td>'.htmlspecialchars($user['qq']??'').'</td>';
                 $app.='<td>'.htmlspecialchars($user['nickname']??'').'</td>';
-                $app.='<td>'.$user['money'].'</td>';
+                //$app.='<td>'.$user['money'].'</td>';
                 $app.='<td>'.$user['bank_money'].'</td>';
                 $app.='<td>'.$user['base_money'].'</td>';
                 $app.='<td>'.$user['wait_save_money'].'</td>';
@@ -164,7 +164,7 @@ class View extends Controller {
                     <tr>
                         <th>QQ</th>
                         <th>昵称</th>
-                        <th>余额</th>
+                        <!--<th>余额</th>-->
                         <th>存款</th>
                         <th>用户本金</th>
                         <th>待存余额</th>
