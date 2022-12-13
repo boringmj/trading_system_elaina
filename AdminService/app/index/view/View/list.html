@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<head>
+    <!--适应手机-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style>
+        .user_info {
+            margin-bottom: 20px;
+        }
+
+        .user_info span {
+            margin-right: 20px;
+        }
+
+        .user_info span:nth-child(2) {
+            color: #999;
+        }
+
+
+        #app {
+            width: 80%;
+            margin: 0 auto;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        table tr td {
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="app">
+        <a href="/index/view/list">所有</a>|
+        <a href="/index/view/list/type/wait_save">存款</a>|
+        <a href="/index/view/list/type/wait_take">取款</a>|
+        <br>
+        {{app}}
+    </div>
+</body>
