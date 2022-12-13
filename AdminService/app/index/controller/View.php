@@ -52,7 +52,7 @@ class View extends Controller {
                 $list.="
                     <tr>
                         <td>{$money['money']}</td>
-                        <td>".htmlspecialchars($money['remark'])."</td>
+                        <td>".htmlspecialchars($money['remark']??'')."</td>
                         <td>".date('Y-m-d H:i:s',$money['create_time'])."</td>
                         <td>转出</td>
                     </tr>
@@ -82,8 +82,8 @@ class View extends Controller {
             }
             return view(array(
                 'title'=>'我的信息',
-                'username'=>htmlspecialchars($user_info['username']),
-                'nickname'=>htmlspecialchars($user_info['nickname']),
+                'username'=>htmlspecialchars($user_info['username']??''),
+                'nickname'=>htmlspecialchars($user_info['nickname']??''),
                 'money'=>$user_info['money'],
                 'bank_money'=>$bank_info['money'],
                 'bank_base_money'=>$bank_info['base_money'],
@@ -146,8 +146,8 @@ class View extends Controller {
                     $money=((int)((($diff_time % 86400) * 0.005 ) * $user['base_money'])) / 100;
                 }
                 $app.='<tr>';
-                $app.='<td>'.htmlspecialchars($user['qq']).'</td>';
-                $app.='<td>'.htmlspecialchars($user['nickname']).'</td>';
+                $app.='<td>'.htmlspecialchars($user['qq']??'').'</td>';
+                $app.='<td>'.htmlspecialchars($user['nickname']??'').'</td>';
                 $app.='<td>'.$user['money'].'</td>';
                 $app.='<td>'.$user['bank_money'].'</td>';
                 $app.='<td>'.$user['base_money'].'</td>';
