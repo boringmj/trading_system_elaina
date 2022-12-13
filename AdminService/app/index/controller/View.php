@@ -93,7 +93,7 @@ class View extends Controller {
                 'bank_take_date'=>$bank_info['take_date']?date('Y-m-d H:i:s',$bank_info['take_date']):'无',
                 'list'=>$list,
                 'event_money'=>$user_info['event_money'],
-                'money'=>$money,
+                'bank_money_tow'=>$money,
             ));
         } catch(Exception $e) {
             $this->header('Location','/index/view/login');
