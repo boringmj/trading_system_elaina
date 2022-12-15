@@ -210,6 +210,64 @@ class Money extends Model {
     }
 
     /**
+     * 通过id回滚一条交易记录(不可逆)
+     * 
+     * @access public
+     * @param int $id 交易记录ID
+     * @param string $remark_re 回滚备注
+     * @return void
+     * @throws Exception
+     */
+    public function rollbackById(int $id,string $remark_re='余额回滚-03') {
+        $money=$this->where('id',$id)->find();
+        if(!$money) {
+            throw new Exception('交易记录不存在');
+        }
+        // 回滚用户余额(事务处理)
+        $User=new User();
+        $User->beginTransaction();
+        $this->beginTransaction();
+        App::get('Log')->write('发生回滚事件-{name} | ID: {id}, 时间: {time}',array(
+            'name'=>'转账回滚-ID',
+            'id'=>$id,
+            'time'=>date('Y-m-d H:i:s')
+        ));
+        try {
+            $user_money_to=$User->getMoney($money['uuid']);
+            $user_money_from=$User->getMoney($money['from_uuid']);
+            $User->where('uuid',$money['uuid'])->update(array(
+                'money'=>$user_money_to-$money['money']
+            ));
+            $User->where('uuid',$money['from_uuid'])->update(array(
+                'money'=>$user_money_from+$money['money']
+            ));
+            // 新增一条回滚记录
+            $this->insert(array(
+                'uuid'=>$money['uuid'],
+                'from_uuid'=>$money['from_uuid'],
+                'money'=>-$money['money'],
+                'remark'=>$remark_re,
+                'create_time'=>time()
+            ));
+            App::get('Log')->write('回滚成功-{name} | 来源: {from}, 目标: {to}, 金额: {money}',array(
+                'name'=>'转账回滚',
+                'from'=>$money['from_uuid'],
+                'to'=>$money['uuid'],
+                'money'=>$money['money']
+            ));
+            $User->commit();
+            $this->commit();
+        } catch(Exception $e) {
+            App::get('Log')->write('回滚失败-{error}',array(
+                'error'=>$e->getMessage()
+            ));
+            $User->rollback();
+            $this->rollback();
+            throw $e;
+        }
+    }
+
+    /**
      * 通过UUID查询用户所有交易记录
      * 
      * @access public
