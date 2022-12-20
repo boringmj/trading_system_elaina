@@ -107,16 +107,13 @@ class Mall extends Model {
         $page=$page<1?1:$page;
         $limit=$limit<1?1:$limit;
         $offset=($page-1)*$limit;
-        $sql="
-            ELECT
-            `product_uuid`,`product_name`,`product_code`,`price`,`create_time`
-            FROM
-            `{$this->table_name}` WHERE `status`=1 ORDER BY `create_time` DESC LIMIT {$offset},{$limit}
-        ";
+        $sql="SELECT `product_uuid`,`product_name`,`product_code`,`price`,`create_time` FROM `{$this->table_name}` WHERE `status`=1 ORDER BY `create_time` DESC LIMIT ?,?";
         try {
             $db=$this->getDb();
             // 执行查询
             $stm=$db->prepare($sql);
+            $stm->bindValue(1,$offset,\PDO::PARAM_INT);
+            $stm->bindValue(2,$limit,\PDO::PARAM_INT);
             $stm->execute();
             $bank_info=$stm->fetchAll();
             return $bank_info;
