@@ -19,6 +19,9 @@ return array(
             )
         ),
         'key'=>'dGwCERvJ1zis&!-JdxZww#A7EI@jS3op' // 系统调用接口的密钥
+    ),
+    'mall'=>array(
+        'cdkey_verify_url'=>'https://pivix.cn/dst/verifycdkey/', // CDKEY验证地址
     )
 );
 
