@@ -4,6 +4,7 @@ namespace app\index\controller;
 
 use base\Controller;
 use app\index\model\Bank;
+use AdminService\Log;
 use AdminService\Exception;
 use AdminService\model\User;
 use AdminService\model\Money;
@@ -36,33 +37,48 @@ class View extends Controller {
             // 查询用户交易记录
             $Money=new Money();
             $money_list=$Money->getMoneyListByUUID($token_info['uuid']);
+            $new_money_list = array_merge($money_list['to'],$money_list['from']);
+            usort($new_money_list,function($a,$b) {
+                if($a['create_time']===$b['create_time'])
+                    return 0;
+                return ($a['create_time']>$b['create_time'])?-1:1;;
+            });
             // 构造交易记录列表(转入)
-            foreach($money_list['to'] as $money) {
+            $count=1;
+            foreach($new_money_list as $money) {
+                $type="转出";
+                if($user_info['uuid']===$money['uuid'])
+                    $type="转入";
                 $list.="
                     <tr>
+                        <td>{$count}</td>
                         <td>{$money['money']}</td>
                         <td>{$money['remark']}</td>
                         <td>".date('Y-m-d H:i:s',$money['create_time'])."</td>
-                        <td>转入</td>
+                        <td>{$type}</td>
                     </tr>
                 ";
+                if($count===20)
+                    break;
+                $count++;
             }
             // 构造交易记录列表(转出)
-            foreach($money_list['from'] as $money) {
-                $list.="
-                    <tr>
-                        <td>{$money['money']}</td>
-                        <td>".htmlspecialchars($money['remark']??'')."</td>
-                        <td>".date('Y-m-d H:i:s',$money['create_time'])."</td>
-                        <td>转出</td>
-                    </tr>
-                ";
-            }
+            // foreach($money_list['from'] as $money) {
+            //     $list.="
+            //         <tr>
+            //             <td>{$money['money']}</td>
+            //             <td>".htmlspecialchars($money['remark']??'')."</td>
+            //             <td>".date('Y-m-d H:i:s',$money['create_time'])."</td>
+            //             <td>转出</td>
+            //         </tr>
+            //     ";
+            // }
             // 构造表头
             $list="
                 <table class='table table-bordered'>
                     <thead>
                         <tr>
+                            <th>序号</th>
                             <th>金额</th>
                             <th>备注</th>
                             <th>时间</th>
@@ -164,7 +180,7 @@ class View extends Controller {
                     <tr>
                         <th>QQ</th>
                         <th>昵称</th>
-                        <!--<th>余额</th>-->
+                      <!--  <th>余额</th> -->
                         <th>存款</th>
                         <th>用户本金</th>
                         <th>待存余额</th>
@@ -176,7 +192,7 @@ class View extends Controller {
                 </thead>
                 <tbody>'.$app.'</tbody>';
             $User=new User();
-            $user_info=$User->getUserInfoByUUID('638a10e2-a1d4-2294-395b-7faa609b3005');
+            $user_info=$User->getUserInfoByUUID('63986dfe-4444-4444-4444-444444444444');
             return view(array(
                 'title'=>'存取信息',
                 'app'=>$app,

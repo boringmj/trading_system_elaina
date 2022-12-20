@@ -4,8 +4,7 @@ namespace app\index\controller;
 
 use base\Controller;
 use AdminService\model\Money as MoneyModel;
-
-use function AdminService\common\view;
+use AdminService\Exception;
 
 class Index extends Controller {
 
@@ -21,7 +20,11 @@ class Index extends Controller {
         $Money=new MoneyModel();
         // 转账
         foreach($data as $v) {
-            $Money->transferByQq($v,'1258706440',10,'22年魔女冬季活动补偿');
+            try {
+                $Money->transferByQq($v,'1258706440',10,'22年魔女冬季活动补偿');
+            } catch(Exception $e) {
+                echo $e->getMessage();
+            }
         }
         return "ok!";
     }
@@ -33,7 +36,11 @@ class Index extends Controller {
         $Money=new MoneyModel();
         // 通过id回滚
         foreach($data as $v) {
-            $Money->rollbackById($v,'回滚-22年魔女冬季活动补偿');
+            try{
+                $Money->rollbackById($v,'回滚-22年魔女冬季活动补偿');
+            } catch(Exception $e) {
+                echo $e->getMessage();
+            }
         }
         return "ok!";
     }

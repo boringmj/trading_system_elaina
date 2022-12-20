@@ -372,7 +372,7 @@ class Room extends Model {
      * @throws Exception
      */
     public function monitor() {
-        App::get('Log')->write('房间监控器已启动');
+        //App::get('Log')->write('房间监控器已启动');
         // 将状态为游戏中的房间设置为流局
         $this->where('status',1)->where('update_time',time()-600,'<')->update(array('status'=>4));
         // 将状态为结算中的房间设置为封存

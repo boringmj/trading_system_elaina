@@ -79,7 +79,7 @@ class Money extends Controller {
     }
 
     public function rollback() {
-        //return json(-1,'error');
+        return json(-1,'error');
         $Money=new MoneyModel();
         $date="2022-12-13 00:00:00";
         $timestamp=strtotime($date);
