@@ -51,6 +51,11 @@ abstract class Router {
      */
     private function route(): array {
         $uri=$_SERVER['REQUEST_URI'];
+        App::get('Log')->write('Request URI: {uri} by {ip}({forwarder_ip})',array(
+            'uri'=>$uri,
+            'ip'=>isset($_SERVER['REMOTE_ADDR'])?$_SERVER['REMOTE_ADDR']:'0.0.0.0',
+            'forwarder_ip'=>isset($_SERVER['HTTP_X_FORWARDED_FOR'])?$_SERVER['HTTP_X_FORWARDED_FOR']:'0.0.0.0'
+        ));
         $uri=explode("?",$uri);
         $uri=$uri[1]??$uri[0];
         $uri=explode("/",$uri);

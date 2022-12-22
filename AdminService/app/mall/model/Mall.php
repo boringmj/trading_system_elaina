@@ -274,17 +274,19 @@ class Mall extends Model {
                 $info=$this->getInfoByCdkey($product['cdkey'],true);
                 $info=$info['data'];
                 if($info['status']==1) {
-                    $this->where('product_uuid',$product['product_uuid'])->update(array(
+                    $this->where('product_uuid',$product['product_uuid'])->where('status',0)->update(array(
                         'status'=>1,
                         'update_time'=>time()
                     ));
+                } else {
+                    throw new Exception('商品状态异常');
                 }
             } catch(Exception $e) {
                 $this->where('product_uuid',$product['product_uuid'])->update(array(
                     'status'=>3,
                     'update_time'=>time()
                 ));
-                App::get('log')->write('商品监控出错: {error}',array(
+                App::get('Log')->write('商品监控出错: {error}',array(
                     'error'=>$e->getMessage()
                 ));
                 continue;
