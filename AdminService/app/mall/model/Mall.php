@@ -212,6 +212,11 @@ class Mall extends Model {
             throw new Exception('用户信息错误');
         // 获取商品信息
         $product=$this->getInfo($product_uuid);
+        // 通过UUID获取用户余额
+        $User=new User();
+        $money=$User->getMoney($uuid);
+        if($money<$product['price'])
+            throw new Exception('余额不足');
         // 获取一个新的cdkey
         $product['new_cdkey']=$this->getNewCdkeyByCdkey($product['cdkey'])['data']['cdk'];
         // $product['new_cdkey']=$product['cdkey'];
