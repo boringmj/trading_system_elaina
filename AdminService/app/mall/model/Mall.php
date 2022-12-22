@@ -270,13 +270,24 @@ class Mall extends Model {
     public function monitor(): void {
         $product_array=$this->where('status',0)->where('create_time',time()-600,'<')->select(array('product_uuid','cdkey'));
         foreach($product_array as $product) {
-            $info=$this->getInfoByCdkey($product['cdkey'],true);
-            $info=$info['data'];
-            if($info['status']==1) {
+            try {
+                $info=$this->getInfoByCdkey($product['cdkey'],true);
+                $info=$info['data'];
+                if($info['status']==1) {
+                    $this->where('product_uuid',$product['product_uuid'])->update(array(
+                        'status'=>1,
+                        'update_time'=>time()
+                    ));
+                }
+            } catch(Exception $e) {
                 $this->where('product_uuid',$product['product_uuid'])->update(array(
-                    'status'=>1,
+                    'status'=>3,
                     'update_time'=>time()
                 ));
+                App::get('log')->write('商品监控出错: {error}',array(
+                    'error'=>$e->getMessage()
+                ));
+                continue;
             }
         }
     }
