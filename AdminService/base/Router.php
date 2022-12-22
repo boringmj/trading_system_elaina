@@ -79,7 +79,7 @@ abstract class Router {
      * @param array $data 数据
      * @return array
      */
-    private static function filterPrivacy(array &$data): array {
+    private static function filterPrivacy(array $data): array {
         $array_list=array('pass','password','passwd','token','key','cdkey','cdk');
         foreach($data as $key=>&$value) {
             if(is_array($value)) {
