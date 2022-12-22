@@ -216,9 +216,9 @@ class Room extends Model {
                 $timeout_list=$Player->where('rmid',$room_info['rmid'])->where('update_time',time()-30,'<')->select();
                 // 删除对应的玩家并恢复房间空位
                 foreach($timeout_list as $value) {
-                   /*  $Player->where('uuid',$value['uuid'])->where('rmid',$room_info['rmid'])->delete();
+                    $Player->where('uuid',$value['uuid'])->where('rmid',$room_info['rmid'])->delete();
                     $vacancy=$room_info['vacancy']+1;
-                    $this->where('rmid',$room_info['rmid'])->update(array('vacancy'=>$vacancy)); */
+                    $this->where('rmid',$room_info['rmid'])->update(array('vacancy'=>$vacancy));
                 }
                 // 判断房间玩家是否已经到齐,房间玩家到齐,则开始游戏
                 if($room_info['vacancy']===0)
