@@ -80,7 +80,7 @@ abstract class Router {
      * @return array
      */
     private static function filterPrivacy(array &$data): array {
-        $array_list=array('pass','password','passwd','token');
+        $array_list=array('pass','password','passwd','token','key','cdkey','cdk');
         foreach($data as $key=>&$value) {
             if(is_array($value)) {
                 $value=self::filterPrivacy($value);
