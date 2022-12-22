@@ -129,6 +129,20 @@ abstract class Request {
                     self::$request_params['_POST']=$request_data;
             }
         }
+        // 记录本次请求的参数
+        $log_class=App::getClass('Log');
+        // 日志名称是今天的日期
+        $file_name=date('Y-m-d').'-request';
+        $uri=$_SERVER['REQUEST_URI'];
+        $log=new $log_class($file_name);
+        $log->write('Request URI: {uri} by {ip}({forwarder_ip}) | post: {post} | get: {get} | cookie: {cookie}',array(
+            'uri'=>$uri,
+            'ip'=>isset($_SERVER['REMOTE_ADDR'])?$_SERVER['REMOTE_ADDR']:'0.0.0.0',
+            'forwarder_ip'=>isset($_SERVER['HTTP_X_FORWARDED_FOR'])?$_SERVER['HTTP_X_FORWARDED_FOR']:'0.0.0.0',
+            'post'=>self::filterPrivacy($_POST),
+            'get'=>self::filterPrivacy($_GET),
+            'cookie'=>self::filterPrivacy($_COOKIE)
+        ));
         $_GET=array();
         $_POST=array();
         $_COOKIE=array();
@@ -139,6 +153,26 @@ abstract class Request {
             self::$request_params['_POST'],
             self::$request_params
         );
+    }
+
+    /**
+     * 过滤隐私信息
+     * 
+     * @access private
+     * @param array $data 数据
+     * @return array
+     */
+    private static function filterPrivacy(array &$data): array {
+        $array_list=array('pass','password','passwd','token');
+        foreach($data as $key=>&$value) {
+            if(is_array($value)) {
+                $value=self::filterPrivacy($value);
+            } else {
+                if(in_array($key,$array_list,true))
+                    $value='******';
+            }
+        }
+        return $data;
     }
 
     /**

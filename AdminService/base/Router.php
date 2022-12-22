@@ -51,7 +51,12 @@ abstract class Router {
      */
     private function route(): array {
         $uri=$_SERVER['REQUEST_URI'];
-        App::get('Log')->write('Request URI: {uri} by {ip}({forwarder_ip})',array(
+        // 写入本次请求的日志
+        $log_class=App::getClass('Log');
+        // 日志名称是今天的日期
+        $file_name=date('Y-m-d').'-request';
+        $log=new $log_class($file_name);
+        $log->write('Request URI: {uri} by {ip}({forwarder_ip})',array(
             'uri'=>$uri,
             'ip'=>isset($_SERVER['REMOTE_ADDR'])?$_SERVER['REMOTE_ADDR']:'0.0.0.0',
             'forwarder_ip'=>isset($_SERVER['HTTP_X_FORWARDED_FOR'])?$_SERVER['HTTP_X_FORWARDED_FOR']:'0.0.0.0'
