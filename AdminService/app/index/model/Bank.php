@@ -62,7 +62,8 @@ class Bank extends Model {
             // 执行查询
             $stm=$db->prepare($sql);
             $stm->execute();
-            $bank_info=$stm->fetchAll();
+            // 只需要键名
+            $bank_info=$stm->fetchAll(\PDO::FETCH_ASSOC);
             return $bank_info;
         } catch(\PDOException $e) {
             throw new Exception("数据库查询错误",0,array(

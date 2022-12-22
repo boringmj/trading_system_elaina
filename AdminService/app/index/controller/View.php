@@ -94,7 +94,7 @@ class View extends Controller {
             $diff_time=time()-$bank_info['save_date'];
             if($diff_time>=604800&&$bank_info['save_date']!==null) {
                 // 计算利息
-                $money=((int)((($diff_time % 86400) * 0.005 ) * $bank_info['base_money'])) / 100;
+                $money=((int)((($diff_time / 86400) * 0.005 ) * $bank_info['base_money'] * 100)) / 100;
             }
             return view(array(
                 'title'=>'我的信息',
@@ -159,7 +159,7 @@ class View extends Controller {
                 $diff_time=time()-$user['save_date'];
                 if($diff_time>=604800&&$user['save_date']!==null) {
                     // 计算利息
-                    $money=((int)((($diff_time % 86400) * 0.005 ) * $user['base_money'])) / 100;
+                    $money=((int)((($diff_time / 86400) * 0.005 ) * $user['base_money'] * 100)) / 100;
                 }
                 $app.='<tr>';
                 $app.='<td>'.htmlspecialchars($user['qq']??'').'</td>';
