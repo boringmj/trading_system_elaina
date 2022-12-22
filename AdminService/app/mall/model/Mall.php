@@ -213,7 +213,7 @@ class Mall extends Model {
         // 获取商品信息
         $product=$this->getInfo($product_uuid);
         // 获取一个新的cdkey
-        $product['new_cdkey']=$this->getNewCdkeyByCdkey($product['cdkey']);
+        $product['new_cdkey']=$this->getNewCdkeyByCdkey($product['cdkey'])['data']['cdk'];
         $Money=new Money();
         // 开启事务
         $this->beginTransaction();
