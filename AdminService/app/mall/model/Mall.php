@@ -98,7 +98,7 @@ class Mall extends Model {
      */
     public function putOnByQq(string $cdkey,string $qq,float $price): array {
         // 检查价格是否合法
-        if($price<20||$price>100)
+        if($price<8.88||$price>168)
             throw new Exception('价格不合法');
         // 保留两位小数
         $price=round($price,2);
@@ -232,9 +232,9 @@ class Mall extends Model {
             $Money->transferByUuid($bank_uuid,$uuid,$product['price'],
                 '购买商品:'.$product['product_name'].'|'.$product['new_cdkey']
             );
-            // 将手续费转移到管理员(管理员可以获取交易手续费的40%,最高1.6)
+            // 将手续费转移到管理员(管理员可以获取交易手续费的40%,最高2)
             $handling_fee=round($product['price']*$handling_fee,2);
-            $handling_fee_admin=min(round($handling_fee*0.4,2),1.6);
+            $handling_fee_admin=min(round($handling_fee*0.4,2),2);
             $Money->transferByUuid($admin_uuid,$bank_uuid,$handling_fee_admin,
                 '交易手续费:'.$product['product_name'].'|'.$product['price'].'兔元'
             );
