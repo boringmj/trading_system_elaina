@@ -4,7 +4,7 @@ namespace AdminService\app;
 
 return array(
     'user'=>array(
-        'salt'=>'#m$Wtr9l2*LPX@*b7',
+        'salt'=>'#m$Wtr9l2*LPX@*b7', // 用户密码加密盐(在上线前允许随意修改, 请勿在上线后修改, 这将导致旧的用户无法登录)
         'check'=>true, // 是否检查用户真实性(这将会导致性能有所下降) (default: false)
         'token'=>array(
             'expire'=>3600, // 令牌过期时间(秒) (default: 3600)
@@ -18,10 +18,10 @@ return array(
                 'password'=>'/^.{6,36}$/' // 密码规则
             )
         ),
-        'key'=>'dGwCERvJ1zis&!-JdxZww#A7EI@jS3op' // 系统调用接口的密钥
+        'key'=>'dGwCERvJ1zis&!-JdxZww#A7EI@jS3op' // 系统调用接口的密钥(请在上线前进行修改, 上线后允许自由修改)
     ),
     'mall'=>array(
-        'cdkey_verify_url'=>'https://pivix.cn/dst/verifycdkey/', // CDKEY验证地址
+        'cdkey_verify_url'=>'https://pivix.cn/dst/verifycdkey/', // CDKEY校验地址
     )
 );
 
