@@ -214,6 +214,7 @@ class Mall extends Model {
         $product=$this->getInfo($product_uuid);
         // 获取一个新的cdkey
         $product['new_cdkey']=$this->getNewCdkeyByCdkey($product['cdkey'])['data']['cdk'];
+        // $product['new_cdkey']=$product['cdkey'];
         $Money=new Money();
         // 开启事务
         $this->beginTransaction();
@@ -228,7 +229,7 @@ class Mall extends Model {
             );
             // 将手续费转移到管理员(管理员可以获取交易手续费的40%,最高1.6)
             $handling_fee=round($product['price']*$handling_fee,2);
-            $handling_fee_admin=min(round($handling_fee*0.4),1.6);
+            $handling_fee_admin=min(round($handling_fee*0.4,2),1.6);
             $Money->transferByUuid($admin_uuid,$bank_uuid,$handling_fee_admin,
                 '交易手续费:'.$product['product_name'].'|'.$product['price'].'兔元'
             );

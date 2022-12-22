@@ -103,8 +103,10 @@ abstract class SqlDrive implements Sql {
     public function beginTransaction(): void {
         $this->check_connect();
         // 判断是否已经开启事务
-        if ($this->db->inTransaction())
-            throw new Exception('Transaction has been started.',100410);
+        if ($this->db->inTransaction()) {
+            return;
+            // throw new Exception('Transaction has been started.',100410);
+        }
         $this->db->beginTransaction();
     }
 
@@ -116,8 +118,10 @@ abstract class SqlDrive implements Sql {
      */
     public function commit(): void {
         $this->check_connect();
-        if(!$this->db->inTransaction())
-            throw new Exception('Transaction has not been started.',100411);
+        if(!$this->db->inTransaction()) {
+            return;
+            // throw new Exception('Transaction has not been started.',100411);
+        }
         $this->db->commit();
     }
 
@@ -129,8 +133,10 @@ abstract class SqlDrive implements Sql {
      */
     public function rollBack(): void {
         $this->check_connect();
-        if(!$this->db->inTransaction())
-            throw new Exception('Transaction has not been started.',100412);
+        if(!$this->db->inTransaction()) {
+            return;
+            // throw new Exception('Transaction has not been started.',100412);
+        }
         $this->db->rollBack();
     }
 
