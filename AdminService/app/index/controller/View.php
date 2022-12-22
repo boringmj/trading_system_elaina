@@ -4,7 +4,6 @@ namespace app\index\controller;
 
 use base\Controller;
 use app\index\model\Bank;
-use AdminService\Log;
 use AdminService\Exception;
 use AdminService\model\User;
 use AdminService\model\Money;
@@ -218,6 +217,17 @@ class View extends Controller {
                 'msg'=>'请登录'
             ));
         }
+        // 清除上次的bug
+        $this->cookie(array(
+            'token'=>array(
+                'value'=>'',
+                'expires'=>time(),
+            ),
+            'uuid'=>array(
+                'value'=>'',
+                'expires'=>time(),
+            )
+        ));
         try {
             $User=new User();
             $user_info=$User->loginByQQ($username,$password);

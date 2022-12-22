@@ -62,7 +62,7 @@ class Token extends Model {
         $token_info=$this->where('token',$token)->find();
         // 检查令牌是否过期
         if(empty($token_info)||$token_info['expire_time']<time())
-            throw new Exception('令牌已过期');
+            throw new Exception('令牌已过期,请重新登录');
         // 判断是否需要强制验证用户真实性
         if(Config::get('app.config.all.user.check',false)) {
             $User=new User();
