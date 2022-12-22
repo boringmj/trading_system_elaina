@@ -106,6 +106,9 @@ class Index extends Controller {
             // 获取信息
             $Room=new Room();
             $Room->monitor();
+            // 把商城的监控也挂上
+            $Mall=new \app\mall\model\Mall();
+            $Mall->monitor();
             return json(1,'ok');
         } catch (Exception $e) {
             return json(-1,$e->getMessage());

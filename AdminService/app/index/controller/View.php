@@ -14,6 +14,10 @@ use function AdminService\common\view;
 
 class View extends Controller {
 
+    public function shop() {
+        return view('shop');
+    }
+
     public function index() {
         // 检查用户是否登录
         $token=$this->param('token');
@@ -219,8 +223,14 @@ class View extends Controller {
             $user_info=$User->loginByQQ($username,$password);
             // 设置cookie信息
             $this->cookie(array(
-                'token'=>$user_info['token'],
-                'uuid'=>$user_info['uuid']
+                'token'=>array(
+                    'value'=>$user_info['token'],
+                    'path'=>'/'
+                ),
+                'uuid'=>array(
+                    'value'=>$user_info['uuid'],
+                    'path'=>'/'
+                )
             ));
             // 设置返回头
             $this->header('Location','/index/view/index');

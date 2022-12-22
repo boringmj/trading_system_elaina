@@ -18,10 +18,11 @@ return array(
                 'password'=>'/^.{6,36}$/' // 密码规则
             )
         ),
-        'key'=>'dGwCERvJ1zis&!-JdxZww#A7EI@jS3op' // 系统调用接口的密钥(请在上线前进行修改, 上线后允许自由修改)
+        'key'=>'dGwCERvJ1zis&!-JdxZww#A7EI@jS3od' // 系统调用接口的密钥(请在上线前进行修改, 上线后允许自由修改)
     ),
     'mall'=>array(
         'cdkey_verify_url'=>'https://pivix.cn/dst/verifycdkey/', // CDKEY校验地址
+        'cdkey_replacecdk_url'=>'https://pivix.cn/dst/replacecdk/', // CDKEY替换地址
     )
 );
 
