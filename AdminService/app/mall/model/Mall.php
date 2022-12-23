@@ -254,7 +254,10 @@ class Mall extends Model {
                 // 保留两位小数
                 $product['price']=round($product['price'],2);
                 // 将tag转换为数组
-                $product['tag']=explode(',',$product['tag']);
+                if(empty($product['tag']))
+                    $product['tag']=array();
+                else
+                    $product['tag']=explode(',',$product['tag']);
             }
             return $product_array;
         } catch(\PDOException $e) {
@@ -291,7 +294,10 @@ class Mall extends Model {
         // 保留两位小数
         $product['price']=round($product['price'],2);
         // 将tag转换为数组
-        $product['tag']=explode(',',$product['tag']);
+        if(empty($product['tag']))
+            $product['tag']=array();
+        else
+            $product['tag']=explode(',',$product['tag']);
         return $product;
     }
 
