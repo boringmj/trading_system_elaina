@@ -220,12 +220,12 @@ class View extends Controller {
         // 清除上次的bug
         $this->cookie(array(
             'token'=>array(
-                'value'=>'',
-                'expires'=>time(),
+                'value'=>'test',
+                'expire'=>time()-1,
             ),
             'uuid'=>array(
-                'value'=>'',
-                'expires'=>time(),
+                'value'=>'test',
+                'expire'=>time()-1,
             )
         ));
         try {
