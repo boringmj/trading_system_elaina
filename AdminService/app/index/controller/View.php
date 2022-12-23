@@ -19,8 +19,8 @@ class View extends Controller {
 
     public function index() {
         // 检查用户是否登录
-        $token=$this->param('token');
-        $uuid=$this->param('uuid');
+        $token=$this->param('token_user');
+        $uuid=$this->param('uuid_user');
         if($token==null||$uuid==null) {
             $this->header('Location','/index/view/login');
             return '';
@@ -217,21 +217,14 @@ class View extends Controller {
                 'msg'=>'请登录'
             ));
         }
-        // 清除上次的bug
-        $this->cookie(array(
-            'token'=>array(
-                'value'=>'test',
-                'expire'=>time()-1,
-            ),
-            'uuid'=>array(
-                'value'=>'test',
-                'expire'=>time()-1,
-            )
-        ));
         try {
             $User=new User();
             $user_info=$User->loginByQQ($username,$password);
             // 设置cookie信息
+            $this->cookie(array(
+                'token_user'=>$user_info['token'],
+                'uuid_user'=>$user_info['uuid']
+            ));
             $this->cookie(array(
                 'token'=>array(
                     'value'=>$user_info['token'],
