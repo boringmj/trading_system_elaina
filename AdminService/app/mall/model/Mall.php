@@ -245,6 +245,11 @@ class Mall extends Model {
                     $product['img']='/img'.'/'.$product['product_code'].'.png';
                 else
                     $product['img']='/img/icon.png';
+                // 防止xss攻击
+                $product['product_name']=htmlspecialchars($product['product_name']);
+                $product['product_code']=htmlspecialchars($product['product_code']);
+                // 保留两位小数
+                $product['price']=round($product['price'],2);
             }
             return $product_array;
         } catch(\PDOException $e) {
@@ -272,6 +277,11 @@ class Mall extends Model {
             $product['img']='/img'.'/'.$product['product_code'].'.png';
         else
             $product['img']='/img/icon.png';
+        // 防止xss攻击
+        $product['product_name']=htmlspecialchars($product['product_name']);
+        $product['product_code']=htmlspecialchars($product['product_code']);
+        // 保留两位小数
+        $product['price']=round($product['price'],2);
         return $product;
     }
 
