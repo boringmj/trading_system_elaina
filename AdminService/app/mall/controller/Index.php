@@ -7,6 +7,7 @@ use app\mall\model\Mall;
 use AdminService\Config;
 use AdminService\Request;
 use AdminService\Exception;
+use AdminService\model\Token;
 
 use function AdminService\common\json;
 use function AdminService\common\sign;
@@ -53,6 +54,17 @@ class Index extends Controller {
 
     public function info() {
         $product_uuid=$this->param('product_uuid','');
+        $uuid=$this->param('uuid','');
+        $token=$this->param('token','');
+        // 判断用户是否登录
+        try {
+            $Token=new Token();
+            $token_info=$Token->getTokenInfo($token);
+            if($token_info['uuid']!=$uuid)
+                throw new Exception('用户信息与token不匹配');
+        } catch (Exception) {
+            $uuid='';
+        }
         try {
             $Mall=new Mall();
             $result=$Mall->getInfo($product_uuid);
@@ -62,6 +74,70 @@ class Index extends Controller {
                 'product_code'=>$result['product_code'],
                 'price'=>$result['price'],
                 'img'=>$result['img'],
+                'is_user'=>$result['uuid']===$uuid,
+            ));
+        } catch (Exception $e) {
+            return json(-1,$e->getMessage());
+        }
+    }
+
+    public function take_off() {
+        $product_uuid=$this->param('product_uuid','');
+        $uuid=$this->param('uuid','');
+        $token=$this->param('token','');
+        $sign=$this->param('sign','');
+        // 验证签名
+        $data=array(
+            'product_uuid'=>$product_uuid,
+            'uuid'=>$uuid,
+            'token'=>$token
+        );
+        $server_sign=sign($data);
+        if($server_sign!=$sign)
+            return json(-1,'签名错误');
+        // 判断用户是否登录
+        try {
+            $Token=new Token();
+            $token_info=$Token->getTokenInfo($token);
+            if($token_info['uuid']!=$uuid)
+                throw new Exception('用户信息与token不匹配');
+            // 尝试下架商品
+            $Mall=new Mall();
+            $Mall->takeOff($product_uuid,$uuid);
+            return json(1,'下架成功');
+        } catch (Exception $e) {
+            return json(-1,$e->getMessage());
+        }
+    }
+
+    public function change_price() {
+        $product_uuid=$this->param('product_uuid','');
+        $uuid=$this->param('uuid','');
+        $token=$this->param('token','');
+        $price=$this->param('price','');
+        $sign=$this->param('sign','');
+        // 验证签名
+        $data=array(
+            'product_uuid'=>$product_uuid,
+            'uuid'=>$uuid,
+            'token'=>$token,
+            'price'=>$price
+        );
+        $server_sign=sign($data);
+        if($server_sign!=$sign)
+            return json(-1,'签名错误');
+        // 判断用户是否登录
+        try {
+            $Token=new Token();
+            $token_info=$Token->getTokenInfo($token);
+            if($token_info['uuid']!=$uuid)
+                throw new Exception('用户信息与token不匹配');
+            // 尝试修改价格
+            $Mall=new Mall();
+            $result=$Mall->changePrice($product_uuid,$uuid,$price);
+            return json(1,'修改成功',array(
+                'product_uuid'=>$product_uuid,
+                'price'=>$result['price'],
             ));
         } catch (Exception $e) {
             return json(-1,$e->getMessage());
@@ -92,15 +168,30 @@ class Index extends Controller {
         $uuid=$Request->getCookie('uuid','');
         $token=$Request->getCookie('token','');
         $sign=$Request->getPost('sign','');
+        // 获取商品信息
+        $price=0;
+        $code='';
+        $name='';
+        try {
+            $info=$this->info();
+            $price=$info['price'];
+            $code=$info['product_code'];
+            $name=$info['product_name'];
+        } catch (Exception $e) {
+            return json(-1,$e->getMessage());
+        }
         // 验证参数
         $data=array(
             'product_uuid'=>$product_uuid,
             'uuid'=>$uuid,
-            'token'=>$token
+            'token'=>$token,
+            'price'=>$price,
+            'product_code'=>$code,
+            'product_name'=>$name,
         );
         $server_sign=sign($data);
         if($server_sign!=$sign)
-            return json(-1,'签名错误',array());
+            return json(-1,'商品信息已修改,请刷新网页',array());
         try {
             $Mall=new Mall();
             $result=$Mall->buy($product_uuid,$uuid,$token);

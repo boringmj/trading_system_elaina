@@ -87,6 +87,87 @@ class Mall extends Model {
     }
 
     /**
+     * 解除CDKEY锁定
+     * 
+     * @access public
+     * @param string $cdkey
+     * @return array
+     * @throws Exception
+     */
+    public function unlockCdkey(string $cdkey): array {
+        $url=App::getClass('Config')::get('app.config.all.mall.cdkey_unlock_url');
+        $data=array(
+            'cdk'=>$cdkey,
+            'token'=>App::getClass('Config')::get('app.config.all.user.key')
+        );
+        $sign=sign($data);
+        $data['token']=$sign;
+        $result=httpPost($url,$data,'json');
+        $result=json_decode($result,true);
+        App::get('Log')->write('{url} | {cdk} | {sign} | {data} | {result}',array(
+            'url'=>$url,
+            'cdk'=>$cdkey,
+            'sign'=>$sign,
+            'data'=>$data,
+            'result'=>$result
+        ));
+        if(empty($result))
+            throw new Exception('解除CDKEY锁定失败');
+        if($result['code']!=1)
+            throw new Exception($result['msg']);
+        return $result;
+    }
+
+    /**
+     * 下架一个商品
+     * 
+     * @access public
+     * @param string $product_uuid 商品uuid
+     * @param string $uuid 用户uuid
+     * @return void
+     * @throws Exception
+     */
+    public function takeOff(string $product_uuid,string $uuid): void {
+        $product=$this->where('product_uuid',$product_uuid)->where('uuid',$uuid)->where('status',1)->find(array('status','uuid','cdkey'));
+        if(empty($product))
+            throw new Exception('商品不存在');
+        // 解除CDKEY锁定
+        $this->unlockCdkey($product['cdkey']);
+        $this->where('product_uuid',$product_uuid)->update(array(
+            'status'=>4,
+            'update_time'=>time()
+        ));
+    }
+
+    /**
+     * 修改商品价格
+     * 
+     * @access public
+     * @param string $product_uuid 商品uuid
+     * @param string $uuid 用户uuid
+     * @param float $price 价格
+     * @return array
+     * @throws Exception
+     */
+    public function changePrice(string $product_uuid,string $uuid,float $price): array {
+        $product=$this->where('product_uuid',$product_uuid)->where('uuid',$uuid)->where('status',1)->find(array('status','uuid'));
+        if(empty($product))
+            throw new Exception('商品不存在');
+        // 检查价格是否合法
+        if($price<8.88||$price>168)
+            throw new Exception('价格不合法');
+        // 保留两位小数
+        $price=round($price,2);
+        $this->where('product_uuid',$product_uuid)->update(array(
+            'price'=>$price,
+            'update_time'=>time()
+        ));
+        return array(
+            'price'=>$price
+        );
+    }
+
+    /**
      * 上架一个商品
      * 
      * @access public

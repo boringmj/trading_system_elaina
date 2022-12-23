@@ -23,6 +23,7 @@ return array(
     'mall'=>array(
         'cdkey_verify_url'=>'https://pivix.cn/dst/verifycdkey/', // CDKEY校验地址
         'cdkey_replacecdk_url'=>'https://pivix.cn/dst/replacecdk/', // CDKEY替换地址
+        'cdkey_unlock_url'=>'https://pivix.cn/dst/unlockcdk/', // CDKEY解锁地址
     )
 );
 
