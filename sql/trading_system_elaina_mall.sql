@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS `trading_system_elaina_mall` (
   `priority` int(10) NULL DEFAULT '0',
   `buy_uuid` varchar(36) NULL DEFAULT '',
   `create_time` int(10) NOT NULL,
+  `tag` varchar(254) NULL DEFAULT '',
   `update_time` int(10) NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 

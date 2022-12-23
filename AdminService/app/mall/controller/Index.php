@@ -74,6 +74,7 @@ class Index extends Controller {
                 'product_code'=>$result['product_code'],
                 'price'=>$result['price'],
                 'img'=>$result['img'],
+                'tag'=>$result['tag'],
                 'is_user'=>$result['uuid']===$uuid,
             ));
         } catch (Exception $e) {

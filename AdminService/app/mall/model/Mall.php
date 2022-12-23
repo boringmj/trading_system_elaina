@@ -230,7 +230,7 @@ class Mall extends Model {
         $page=$page<1?1:$page;
         $limit=$limit<1?1:$limit;
         $offset=($page-1)*$limit;
-        $sql="SELECT `product_uuid`,`product_name`,`product_code`,`price`,`create_time` FROM `{$this->table_name}` WHERE `status`=1 ORDER BY `priority` DESC,`price` ASC,`id` DESC LIMIT ?,?";
+        $sql="SELECT `product_uuid`,`product_name`,`product_code`,`price`,`create_time`,`tag` FROM `{$this->table_name}` WHERE `status`=1 ORDER BY `priority` DESC,`price` ASC,`id` DESC LIMIT ?,?";
         try {
             $db=$this->getDb();
             // 执行查询
@@ -248,8 +248,13 @@ class Mall extends Model {
                 // 防止xss攻击
                 $product['product_name']=htmlspecialchars($product['product_name']);
                 $product['product_code']=htmlspecialchars($product['product_code']);
+                if(empty($product['tag']))
+                    $product['tag']='';
+                $product['tag']=htmlspecialchars($product['tag']);
                 // 保留两位小数
                 $product['price']=round($product['price'],2);
+                // 将tag转换为数组
+                $product['tag']=explode(',',$product['tag']);
             }
             return $product_array;
         } catch(\PDOException $e) {
@@ -269,7 +274,7 @@ class Mall extends Model {
      * @throws Exception
      */
     public function getInfo(string $product_uuid): array {
-        $product=$this->where('product_uuid',$product_uuid)->where('status',1)->find(array('uuid','cdkey','product_name','product_code','price','create_time'));
+        $product=$this->where('product_uuid',$product_uuid)->where('status',1)->find(array('uuid','cdkey','product_name','product_code','price','create_time','tag'));
         if(empty($product))
             throw new Exception('商品不存在');
         // 判断商品代码对应的图片是否存在
@@ -280,8 +285,13 @@ class Mall extends Model {
         // 防止xss攻击
         $product['product_name']=htmlspecialchars($product['product_name']);
         $product['product_code']=htmlspecialchars($product['product_code']);
+        if(empty($product['tag']))
+            $product['tag']='';
+        $product['tag']=htmlspecialchars($product['tag']);
         // 保留两位小数
         $product['price']=round($product['price'],2);
+        // 将tag转换为数组
+        $product['tag']=explode(',',$product['tag']);
         return $product;
     }
 
