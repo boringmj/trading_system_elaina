@@ -230,7 +230,7 @@ class Mall extends Model {
         $page=$page<1?1:$page;
         $limit=$limit<1?1:$limit;
         $offset=($page-1)*$limit;
-        $sql="SELECT `product_uuid`,`product_name`,`product_code`,`price`,`create_time` FROM `{$this->table_name}` WHERE `status`=1 ORDER BY `id` DESC LIMIT ?,?";
+        $sql="SELECT `product_uuid`,`product_name`,`product_code`,`price`,`create_time` FROM `{$this->table_name}` WHERE `status`=1 ORDER BY `price` ASC,`id` DESC LIMIT ?,?";
         try {
             $db=$this->getDb();
             // 执行查询
