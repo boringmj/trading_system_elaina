@@ -7,7 +7,7 @@ return array(
         'salt'=>'#m$Wtr9l2*LPX@*b7', // 用户密码加密盐(在上线前允许随意修改, 请勿在上线后修改, 这将导致旧的用户无法登录)
         'check'=>true, // 是否检查用户真实性(这将会导致性能有所下降) (default: false)
         'token'=>array(
-            'expire'=>3600, // 令牌过期时间(秒) (default: 3600)
+            'expire'=>86400, // 令牌过期时间(秒) (default: 3600)
             'check'=>true, // 是否强制检查无意义令牌生成(这将会导致性能有所下降) (default: false)
             'allow_multiple'=>true, // 是否允一个用户存在多个令牌 (default: false)
             'allow_renew'=>true, // 是否允许续签(更新)令牌 (default: false)
