@@ -173,7 +173,7 @@ class Index extends Controller {
         $code='';
         $name='';
         try {
-            $info=$this->info();
+            $info=$this->info()['data'];
             $price=$info['price'];
             $code=$info['product_code'];
             $name=$info['product_name'];
