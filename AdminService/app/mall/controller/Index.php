@@ -173,7 +173,10 @@ class Index extends Controller {
         $code='';
         $name='';
         try {
-            $info=$this->info()['data'];
+            $info=$this->info();
+            if($info['code']!=1)
+                throw new Exception($info['msg']);
+            $info=$info['data'];
             $price=$info['price'];
             $code=$info['product_code'];
             $name=$info['product_name'];

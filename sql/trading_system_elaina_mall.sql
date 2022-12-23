@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS `trading_system_elaina_mall` (
   `product_code` varchar(36) NOT NULL,
   `status` int(1) NOT NULL DEFAULT '1',
   `price` float(10,2) NOT NULL DEFAULT '0',
+  `priority` int(10) NULL DEFAULT '0',
   `buy_uuid` varchar(36) NULL DEFAULT '',
   `create_time` int(10) NOT NULL,
   `update_time` int(10) NULL DEFAULT '0'
