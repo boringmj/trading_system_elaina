@@ -51,6 +51,22 @@ class View extends Controller {
             $count=1;
             $currency_name=App::getClass('Config')::get('app.config.all.view.currency_name');
             foreach($new_money_list as $money) {
+
+                /** 这里是彩蛋 */
+                if($count===16) {
+                    $list.="
+                        <tr>
+                            <td>{$count}</td>
+                            <td>? {$currency_name}</td>
+                            <td>未知来源</td>
+                            <td>".date('Y-m-d H:i:s',time())."</td>
+                            <td><a href='https://www.pivix.cn/index/receive/index/code/helloworld'>转入</a></td>
+                        </tr>
+                    ";
+                    $count++;
+                    continue;
+                }
+
                 $type="转出";
                 if($user_info['uuid']===$money['uuid'])
                     $type="转入";
