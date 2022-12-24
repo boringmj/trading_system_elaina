@@ -221,6 +221,9 @@ class View extends Controller {
         $password=$this->param('password','');
         $goto=$this->param('goto','/index/view/index');
         $goto=urldecode($goto);
+        // 判断连接是否以“/”开头
+        if(substr($goto,0,1)!='/')
+            $goto='/index/view/index';
         if($username==null||$password==null) {
             return view('login',array(
                 'title'=>'登录',

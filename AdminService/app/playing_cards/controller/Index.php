@@ -3,6 +3,7 @@
 namespace app\playing_cards\controller;
 
 use base\Controller;
+use AdminService\Request;
 use AdminService\Exception;
 use app\playing_cards\model\Room;
 use app\playing_cards\model\Players;
@@ -13,7 +14,7 @@ class Index extends Controller {
 
     public function create_room() {
         // 获取参数
-        $token=$this->param('token','');
+        $token=Request::getPost('token','');
         try {
             // 创建房间
             $Room=new Room();
@@ -33,8 +34,8 @@ class Index extends Controller {
 
     public function join_room() {
         // 获取参数
-        $token=$this->param('token','');
-        $room_id=$this->param('room_id');
+        $token=Request::getPost('token','');
+        $room_id=Request::getPost('room_id');
         try {
             // 加入房间
             $Room=new Room();
@@ -49,8 +50,8 @@ class Index extends Controller {
 
     public function leave_room() {
         // 获取参数
-        $token=$this->param('token','');
-        $rmid=$this->param('rmid','');
+        $token=Request::getPost('token','');
+        $rmid=Request::getPost('rmid','');
         try {
             // 离开房间
             $Room=new Players();
@@ -63,7 +64,7 @@ class Index extends Controller {
 
     public function get_info() {
         // 获取参数
-        $token=$this->param('token','');
+        $token=Request::getPost('token','');
         try {
             // 获取信息
             $Players=new Players();
@@ -75,8 +76,8 @@ class Index extends Controller {
 
     public function heartbeat() {
         // 获取参数
-        $token=$this->param('token','');
-        $rmid=$this->param('rmid','');
+        $token=Request::getPost('token','');
+        $rmid=Request::getPost('rmid','');
         try {
             // 获取信息
             $Room=new Room();
@@ -88,9 +89,9 @@ class Index extends Controller {
 
     public function play_cards() {
         // 获取参数
-        $token=$this->param('token','');
-        $rmid=$this->param('rmid','');
-        $cards=$this->param('cards','');
+        $token=Request::getPost('token','');
+        $rmid=Request::getPost('rmid','');
+        $cards=Request::getPost('cards','');
         try {
             // 获取信息
             $Players=new Players();

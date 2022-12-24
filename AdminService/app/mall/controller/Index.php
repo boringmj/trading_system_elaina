@@ -164,11 +164,10 @@ class Index extends Controller {
 
     public function buy() {
         // 这里比较敏感, 只信任固定来源的请求
-        $Request=new Request();
-        $product_uuid=$Request->getPost('product_uuid','');
-        $uuid=$Request->getCookie('uuid','');
-        $token=$Request->getCookie('token','');
-        $sign=$Request->getPost('sign','');
+        $product_uuid=Request::getPost('product_uuid','');
+        $uuid=Request::getCookie('uuid','');
+        $token=Request::getCookie('token','');
+        $sign=Request::getPost('sign','');
         // 获取商品信息
         $price=0;
         $code='';
