@@ -73,6 +73,32 @@ class Login extends Controller {
         }
     }
 
+    public function change_password_qq() {
+        // 获取用户qq
+        $qq=$this->param('qq','');
+        $password=$this->param('password','');
+        $sign=$this->param('sign','');
+        // 验证签名
+        $token=Config::get('app.config.all.user.key');
+        $sign_array=array(
+            'qq'=>$qq,
+            'password'=>$password,
+            'token'=>$token
+        );
+        $server_sign=\AdminService\common\sign($sign_array);
+        if($sign!==$server_sign)
+            return json(-1,"签名错误");
+        try {
+            // 实例化模型
+            $User=new User();
+            // 修改密码
+            $User->changePasswordByQQ($qq,$password);
+            return json(1,'修改成功');
+        } catch(Exception $e) {
+            return json(-1,$e->getMessage());
+        }
+    }
+
 }
 
 ?>

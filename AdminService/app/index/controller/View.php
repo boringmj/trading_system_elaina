@@ -55,7 +55,7 @@ class View extends Controller {
                 $list.="
                     <tr>
                         <td>{$count}</td>
-                        <td>{$money['money']}</td>
+                        <td>{$money['money']} 兔元</td>
                         <td>{$money['remark']}</td>
                         <td>".date('Y-m-d H:i:s',$money['create_time'])."</td>
                         <td>{$type}</td>
@@ -82,7 +82,7 @@ class View extends Controller {
                     <thead>
                         <tr>
                             <th>序号</th>
-                            <th>金额</th>
+                            <th>兔元</th>
                             <th>备注</th>
                             <th>时间</th>
                             <th>类型</th>
@@ -99,6 +99,7 @@ class View extends Controller {
                 // 计算利息
                 $money=((int)((($diff_time / 86400) * 0.005 ) * $bank_info['base_money'] * 100)) / 100;
             }
+            $money_expected=((int)((($diff_time / 86400) * 0.005 ) * $bank_info['base_money'] * 100)) / 100;
             return view(array(
                 'title'=>'我的信息',
                 'username'=>htmlspecialchars($user_info['username']??''),
@@ -113,6 +114,8 @@ class View extends Controller {
                 'list'=>$list,
                 'event_money'=>$user_info['event_money'],
                 'bank_money_tow'=>$money,
+                'bank_money_tow_expected'=>$money_expected,
+                'money_total'=>$user_info['money']+$bank_info['money']+$money,
             ));
         } catch(Exception $e) {
             $this->header('Location','/index/view/login');

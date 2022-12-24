@@ -138,6 +138,44 @@ class User extends Model {
     }
 
     /**
+     * 通过UUID修改用户密码
+     * 
+     * @access public
+     * @param string $uuid
+     * @param string $password
+     * @return void
+     * @throws Exception
+     */
+    public function changePasswordByUUID(string $uuid,string $password): void {
+        // 判断用户是否存在
+        $user_info=$this->where('uuid',$uuid)->find();
+        if(empty($user_info))
+            throw new Exception("用户不存在");
+        $password=$this->encryptPassword($password);
+        $this->where('uuid',$uuid)->update(array(
+            'password'=>$password
+        ));
+    }
+
+    /**
+     * 通过QQ修改用户密码
+     * 
+     * @access public
+     * @param string $qq
+     * @param string $password
+     * @return void
+     * @throws Exception
+     */
+    public function changePasswordByQQ(string $qq,string $password): void {
+        // 通过qq获取uuid
+        $user_info=$this->where('qq',$qq)->find(array('uuid'));
+        if(empty($user_info))
+            throw new Exception("用户不存在");
+        $uuid=$user_info['uuid'];
+        $this->changePasswordByUUID($uuid,$password);
+    }
+
+    /**
      * 获取用户余额
      * 
      * @access public
