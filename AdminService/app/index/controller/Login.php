@@ -78,6 +78,9 @@ class Login extends Controller {
         $qq=$this->param('qq','');
         $password=$this->param('password','');
         $sign=$this->param('sign','');
+        // 验证参数
+        if(!preg_match(Config::get('app.config.all.user.register.rule.password'),$password))
+            throw new Exception("密码不合法");
         // 验证签名
         $token=Config::get('app.config.all.user.key');
         $sign_array=array(
