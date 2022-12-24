@@ -2,6 +2,7 @@
 
 namespace app\index\controller;
 
+use AdminService\App;
 use base\Controller;
 use app\index\model\Bank;
 use AdminService\Exception;
@@ -48,6 +49,7 @@ class View extends Controller {
             });
             // 构造交易记录列表(转入)
             $count=1;
+            $currency_name=App::getClass('Config')::get('app.config.all.view.currency_name');
             foreach($new_money_list as $money) {
                 $type="转出";
                 if($user_info['uuid']===$money['uuid'])
@@ -55,13 +57,13 @@ class View extends Controller {
                 $list.="
                     <tr>
                         <td>{$count}</td>
-                        <td>{$money['money']} 兔元</td>
-                        <td>{$money['remark']}</td>
+                        <td>{$money['money']} {$currency_name}</td>
+                        <td>".htmlspecialchars($money['remark']??'')."</td>
                         <td>".date('Y-m-d H:i:s',$money['create_time'])."</td>
                         <td>{$type}</td>
                     </tr>
                 ";
-                if($count===20)
+                if($count===App::getClass('Config')::get('app.config.all.view.list_max'))
                     break;
                 $count++;
             }
@@ -69,7 +71,7 @@ class View extends Controller {
             // foreach($money_list['from'] as $money) {
             //     $list.="
             //         <tr>
-            //             <td>{$money['money']}</td>
+            //             <td>{$money['money']} {$currency_name}</td>
             //             <td>".htmlspecialchars($money['remark']??'')."</td>
             //             <td>".date('Y-m-d H:i:s',$money['create_time'])."</td>
             //             <td>转出</td>
@@ -82,7 +84,7 @@ class View extends Controller {
                     <thead>
                         <tr>
                             <th>序号</th>
-                            <th>兔元</th>
+                            <th>{$currency_name}</th>
                             <th>备注</th>
                             <th>时间</th>
                             <th>类型</th>
@@ -95,11 +97,13 @@ class View extends Controller {
             ";
             $money=0;
             $diff_time=time()-$bank_info['save_date'];
-            if($diff_time>=604800&&$bank_info['save_date']!==null) {
+            $date_min=App::getClass('Config')::get('app.config.all.bank.interest.date_min')*60*60*24;
+            $rate=App::getClass('Config')::get('app.config.all.bank.interest.rate');
+            if($diff_time>=$date_min&&$bank_info['save_date']!==null) {
                 // 计算利息
-                $money=((int)((($diff_time / 86400) * 0.005 ) * $bank_info['base_money'] * 100)) / 100;
+                $money=((int)((($diff_time / 86400) * $rate ) * $bank_info['base_money'] * 100)) / 100;
             }
-            $money_expected=((int)((($diff_time / 86400) * 0.005 ) * $bank_info['base_money'] * 100)) / 100;
+            $money_expected=((int)((($diff_time / 86400) * $rate ) * $bank_info['base_money'] * 100)) / 100;
             return view(array(
                 'title'=>'我的信息',
                 'username'=>htmlspecialchars($user_info['username']??''),
@@ -116,6 +120,7 @@ class View extends Controller {
                 'bank_money_tow'=>$money,
                 'bank_money_tow_expected'=>$money_expected,
                 'money_total'=>$user_info['money']+$bank_info['money']+$money,
+                'currency_name'=>$currency_name,
             ));
         } catch(Exception $e) {
             $this->header('Location','/index/view/login');
@@ -140,11 +145,7 @@ class View extends Controller {
                 return '';
             }
             // 预留管理员的uuid
-            $admin_uuid_list=array(
-                '638a2954-20c9-963f-fcb7-4c757c57cf27',
-                '638a2852-b5e5-50e9-f5ad-faf79a2c9b0e',
-                '638a10e2-a1d4-2294-395b-7faa609b3005'
-            );
+            $admin_uuid_list=App::getClass('Config')::get('app.config.all.bank.admin_uuid');
             if(!in_array($token_info['uuid'],$admin_uuid_list)) {
                 return '你没有权限访问此页面';
             }
@@ -163,9 +164,11 @@ class View extends Controller {
             foreach($user_list as $user) {
                 $money=0;
                 $diff_time=time()-$user['save_date'];
-                if($diff_time>=604800&&$user['save_date']!==null) {
+                $date_min=App::getClass('Config')::get('app.config.all.bank.interest.date_min')*60*60*24;
+                if($diff_time>=$date_min&&$user['save_date']!==null) {
                     // 计算利息
-                    $money=((int)((($diff_time / 86400) * 0.005 ) * $user['base_money'] * 100)) / 100;
+                    $rate=App::getClass('Config')::get('app.config.all.bank.interest.rate');
+                    $money=((int)((($diff_time / 86400) * $rate ) * $user['base_money'] * 100)) / 100;
                 }
                 $app.='<tr>';
                 $app.='<td>'.htmlspecialchars($user['qq']??'').'</td>';
@@ -198,11 +201,13 @@ class View extends Controller {
                 </thead>
                 <tbody>'.$app.'</tbody>';
             $User=new User();
-            $user_info=$User->getUserInfoByUUID('63986dfe-4444-4444-4444-444444444444');
+            $user_info=$User->getUserInfoByUUID(App::getClass('Config')::get('app.config.all.system.uuid.bank'));
+            $currency_name=App::getClass('Config')::get('app.config.all.view.currency_name');
             return view(array(
                 'title'=>'存取信息',
                 'app'=>$app,
-                'bank'=>$user_info['money']
+                'bank'=>$user_info['money'],
+                'currency_name'=>$currency_name
             ));
         } catch(Exception $e) {
             $this->header('Location','/index/view/login');

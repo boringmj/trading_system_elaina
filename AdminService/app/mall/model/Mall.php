@@ -154,7 +154,9 @@ class Mall extends Model {
         if(empty($product))
             throw new Exception('商品不存在');
         // 检查价格是否合法
-        if($price<8.88||$price>168)
+        $price_min=App::getClass('Config')::get('app.config.all.mall.rule.price.min');
+        $price_max=App::getClass('Config')::get('app.config.all.mall.rule.price.max');
+        if($price<$price_min||$price>$price_max)
             throw new Exception('价格不合法');
         // 保留两位小数
         $price=round($price,2);
@@ -179,7 +181,9 @@ class Mall extends Model {
      */
     public function putOnByQq(string $cdkey,string $qq,float $price): array {
         // 检查价格是否合法
-        if($price<8.88||$price>168)
+        $price_min=App::getClass('Config')::get('app.config.all.mall.rule.price.min');
+        $price_max=App::getClass('Config')::get('app.config.all.mall.rule.price.max');
+        if($price<$price_min||$price>$price_max)
             throw new Exception('价格不合法');
         // 保留两位小数
         $price=round($price,2);
@@ -246,11 +250,9 @@ class Mall extends Model {
                 else
                     $product['img']='/img/icon.png';
                 // 防止xss攻击
-                $product['product_name']=htmlspecialchars($product['product_name']);
-                $product['product_code']=htmlspecialchars($product['product_code']);
-                if(empty($product['tag']))
-                    $product['tag']='';
-                $product['tag']=htmlspecialchars($product['tag']);
+                $product['product_name']=htmlspecialchars($product['product_name']??'');
+                $product['product_code']=htmlspecialchars($product['product_code']??'');
+                $product['tag']=htmlspecialchars($product['tag']??'');
                 // 保留两位小数
                 $product['price']=round($product['price'],2);
                 // 将tag转换为数组
@@ -286,11 +288,9 @@ class Mall extends Model {
         else
             $product['img']='/img/icon.png';
         // 防止xss攻击
-        $product['product_name']=htmlspecialchars($product['product_name']);
-        $product['product_code']=htmlspecialchars($product['product_code']);
-        if(empty($product['tag']))
-            $product['tag']='';
-        $product['tag']=htmlspecialchars($product['tag']);
+        $product['product_name']=htmlspecialchars($product['product_name']??'');
+        $product['product_code']=htmlspecialchars($product['product_code']??'');
+        $product['tag']=htmlspecialchars($product['tag']??'');
         // 保留两位小数
         $product['price']=round($product['price'],2);
         // 将tag转换为数组
@@ -332,16 +332,18 @@ class Mall extends Model {
         $this->beginTransaction();
         $Money->beginTransaction();
         try {
-            $bank_uuid='63986dfe-4444-4444-4444-444444444444';
-            $admin_uuid='638a2852-b5e5-50e9-f5ad-faf79a2c9b0e';
-            $handling_fee=0.0888;
+            $bank_uuid=App::getClass('Config')::get('app.config.all.system.uuid.bank');
+            $admin_uuid=App::getClass('Config')::get('app.config.all.mall.rule.price.handling_fee_admin_uuid');
+            $handling_fee=App::getClass('Config')::get('app.config.all.mall.rule.price.handling_fee');
             // 将用户的钱转移到银行
             $Money->transferByUuid($bank_uuid,$uuid,$product['price'],
                 '购买商品:'.$product['product_name'].'|'.$product['new_cdkey']
             );
-            // 将手续费转移到管理员(管理员可以获取交易手续费的40%,最高2)
+            // 将手续费转移到管理员
+            $handling_fee_admin=App::getClass('Config')::get('app.config.all.mall.rule.price.handling_fee_admin');
+            $handling_fee_admin_max=App::getClass('Config')::get('app.config.all.mall.rule.price.handling_fee_admin_max');
             $handling_fee=round($product['price']*$handling_fee,2);
-            $handling_fee_admin=min(round($handling_fee*0.4,2),2);
+            $handling_fee_admin=min(round($handling_fee*$handling_fee_admin,2),$handling_fee_admin_max);
             $Money->transferByUuid($admin_uuid,$bank_uuid,$handling_fee_admin,
                 '交易手续费:'.$product['product_name'].'|'.$product['price'].'兔元'
             );

@@ -20,10 +20,40 @@ return array(
         ),
         'key'=>'dGwCERvJ1zis&!-JdxZww#A7EI@jS3od' // 系统调用接口的密钥(请在上线前进行修改, 上线后允许自由修改)
     ),
+    'system'=>array(
+        'uuid'=>array(
+            'bank'=>'63986dfe-4444-4444-4444-444444444444', // 银行UUID
+        )
+    ),
+    'bank'=>array(
+        'admin_uuid'=>array( // 银行管理员UUID
+            '638a2954-20c9-963f-fcb7-4c757c57cf27',
+            '638a2852-b5e5-50e9-f5ad-faf79a2c9b0e',
+            '638a10e2-a1d4-2294-395b-7faa609b3005'
+        ),
+        'interest'=>array(
+            'rate'=>0.005, // 利率
+            'date_min'=>7, // 最小存款天数(利息按天结算)
+        )
+    ),
+    'view'=>array(
+        'list_max'=>20, // 列表最大显示数量
+        'currency_name'=>'兔元', // 货币名称
+    ),
     'mall'=>array(
         'cdkey_verify_url'=>'https://pivix.cn/dst/verifycdkey/', // CDKEY校验地址
         'cdkey_replacecdk_url'=>'https://pivix.cn/dst/replacecdk/', // CDKEY替换地址
         'cdkey_unlock_url'=>'https://pivix.cn/dst/unlockcdk/', // CDKEY解锁地址
+        'rule'=>array(
+            'price'=>array(
+                'min'=>8.88, // 最低价格
+                'max'=>168, // 最高价格
+                'handling_fee'=>0.0888, // 银行获取的手续费
+                'handling_fee_admin'=>0.4, // 管理员获取的手续费(该项是在银行获取的手续费上扣除的)
+                'handling_fee_admin_max'=>2, // 管理员获取的手续费上限(该项是在银行获取的手续费上扣除的)
+                'handling_fee_admin_uuid'=>'638a2852-b5e5-50e9-f5ad-faf79a2c9b0e', // 管理员UUID
+            ),
+        )
     )
 );
 
