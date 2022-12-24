@@ -217,8 +217,10 @@ class View extends Controller {
 
     public function login() {
         // 处理用户登录
-        $username=$this->param('username');
-        $password=$this->param('password');
+        $username=$this->param('username','');
+        $password=$this->param('password','');
+        $goto=$this->param('goto','/index/view/index');
+        $goto=urldecode($goto);
         if($username==null||$password==null) {
             return view('login',array(
                 'title'=>'登录',
@@ -243,10 +245,8 @@ class View extends Controller {
                     'path'=>'/'
                 )
             ));
-            // 如果有来源则跳转到来源
-            $referer=$_SERVER['HTTP_REFERER']??'/index/view/index';
             // 设置返回头
-            $this->header('Location',$referer);
+            $this->header('Location',$goto);
             return view('login',array(
                 'title'=>'登录',
                 'msg'=>'登录成功'
