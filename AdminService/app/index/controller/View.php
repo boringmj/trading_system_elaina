@@ -243,8 +243,10 @@ class View extends Controller {
                     'path'=>'/'
                 )
             ));
+            // 如果有来源则跳转到来源
+            $referer=$_SERVER['HTTP_REFERER']??'/index/view/index';
             // 设置返回头
-            $this->header('Location','/index/view/index');
+            $this->header('Location',$referer);
             return view('login',array(
                 'title'=>'登录',
                 'msg'=>'登录成功'
