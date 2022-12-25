@@ -59,8 +59,7 @@ class Receive extends Controller {
         // 获取参数
         $uuid=$this->param('uuid','');
         $token=$this->param('token','');
-        $id=$this->param('id','');
-        $none=$this->param('none','');
+        $id=$this->param('id',0);
         $sign=$this->param('sign','');
         if(empty($uuid)||empty($token)) {
             $goto='/index/view/login/goto/'.urlencode('/index/receive/check/id/'.$id.'/sign'.'/'.$sign);
