@@ -29,7 +29,6 @@ class Receive extends Controller {
                 // 需要验证, 跳转到验证页面
                 $data=array(
                     'uuid'=>$uuid,
-                    'token'=>$token,
                     'id'=>$award_info['id'],
                     'code'=>$code,
                     'key'=>App::getClass('Config')::get('app.config.all.user.key')
@@ -74,7 +73,6 @@ class Receive extends Controller {
             // 验证签名
             $data=array(
                 'uuid'=>$uuid,
-                'token'=>$token,
                 'id'=>$id,
                 'code'=>$code,
                 'key'=>App::getClass('Config')::get('app.config.all.user.key')
