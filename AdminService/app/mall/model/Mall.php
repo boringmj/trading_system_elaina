@@ -176,10 +176,11 @@ class Mall extends Model {
      * @param string $cdkey cdkey
      * @param string $qq qq号
      * @param float $price 价格
+     * @param string $tag 标签
      * @return array
      * @throws Exception
      */
-    public function putOnByQq(string $cdkey,string $qq,float $price): array {
+    public function putOnByQq(string $cdkey,string $qq,float $price,string $tag=''): array {
         // 检查价格是否合法
         $price_min=App::getClass('Config')::get('app.config.all.mall.rule.price.min');
         $price_max=App::getClass('Config')::get('app.config.all.mall.rule.price.max');
@@ -210,6 +211,7 @@ class Mall extends Model {
             'product_name'=>$info['skinname'],
             'product_code'=>$info['skinprefab'],
             'status'=>0,
+            'tag'=>$tag,
             'price'=>$price,
             'create_time'=>time()
         ));

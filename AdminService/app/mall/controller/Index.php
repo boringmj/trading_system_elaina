@@ -18,6 +18,7 @@ class Index extends Controller {
         $cdk=$this->param('cdk','');
         $qq=$this->param('qq','');
         $price=$this->param('price','');
+        $tag=$this->param('tag','');
         $sign=$this->param('sign','');
         // 验证参数
         if(empty($cdk))
@@ -31,6 +32,7 @@ class Index extends Controller {
             'cdk'=>$cdk,
             'qq'=>$qq,
             'price'=>$price,
+            'tag'=>$tag,
             'token'=>Config::get('app.config.all.user.key')
         );
         $server_sign=sign($data);
@@ -38,7 +40,7 @@ class Index extends Controller {
             return json(-1,'签名错误');
         try {
             $Mall=new Mall();
-            $result=$Mall->putOnByQq($cdk,$qq,$price);
+            $result=$Mall->putOnByQq($cdk,$qq,$price,$tag);
             return json(1,'上架成功',$result);
         } catch (Exception $e) {
             return json(-1,$e->getMessage());
