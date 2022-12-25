@@ -70,6 +70,7 @@ class Index extends Controller {
         try {
             $Mall=new Mall();
             $result=$Mall->getInfo($product_uuid);
+            $admin_show=Config::get('app.config.all.mall.privilege.'.$uuid.'.admin.show',false);
             return json(1,'获取成功',array(
                 'product_uuid'=>$product_uuid,
                 'product_name'=>$result['product_name'],
@@ -77,7 +78,7 @@ class Index extends Controller {
                 'price'=>$result['price'],
                 'img'=>$result['img'],
                 'tag'=>$result['tag'],
-                'is_user'=>$result['uuid']===$uuid,
+                'is_user'=>($result['uuid']===$uuid||$admin_show),
             ));
         } catch (Exception $e) {
             return json(-1,$e->getMessage());

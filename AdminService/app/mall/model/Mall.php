@@ -150,13 +150,18 @@ class Mall extends Model {
      * @throws Exception
      */
     public function changePrice(string $product_uuid,string $uuid,float $price): array {
-        $product=$this->where('product_uuid',$product_uuid)->where('uuid',$uuid)->where('status',1)->find(array('status','uuid'));
+        $product=$this->where('product_uuid',$product_uuid)->where('status',1)->find(array('status','uuid'));
         if(empty($product))
             throw new Exception('商品不存在');
+        // 判断是否拥有编辑权限
+        $admin_edit=App::getClass('Config')::get('app.config.all.mall.privilege.'.$uuid.'.admin.edit',false);
+        if(($product['uuid']!==$uuid)&&!$admin_edit)
+            throw new Exception('权限不足');
         // 检查价格是否合法
         $price_min=App::getClass('Config')::get('app.config.all.mall.rule.price.min');
         $price_max=App::getClass('Config')::get('app.config.all.mall.rule.price.max');
-        if($price<$price_min||$price>$price_max)
+        $privilege_unlimited_price=App::getClass('Config')::get('app.config.all.mall.privilege.'.$uuid.'.unlimited_price',false);
+        if(($price<$price_min||$price>$price_max)&&!$privilege_unlimited_price)
             throw new Exception('价格不合法');
         // 保留两位小数
         $price=round($price,2);
@@ -184,7 +189,9 @@ class Mall extends Model {
         // 检查价格是否合法
         $price_min=App::getClass('Config')::get('app.config.all.mall.rule.price.min');
         $price_max=App::getClass('Config')::get('app.config.all.mall.rule.price.max');
-        if($price<$price_min||$price>$price_max)
+        $uuid=$privilege_unlimited_price=App::getClass('Config')::get('app.config.all.mall.privilege.qq.'.$qq,$qq);
+        $privilege_unlimited_price=App::getClass('Config')::get('app.config.all.mall.privilege.'.$uuid.'.unlimited_price',false);
+        if(($price<$price_min||$price>$price_max)&&!$privilege_unlimited_price)
             throw new Exception('价格不合法');
         // 保留两位小数
         $price=round($price,2);
@@ -204,6 +211,7 @@ class Mall extends Model {
             throw new Exception('CDKEY状态异常');
         $product_uuid=\AdminService\common\uuid(true);
         // 上架商品
+        $privilege_quick=App::getClass('Config')::get('app.config.all.mall.privilege.'.$uuid.'.quick',false);
         $this->insert(array(
             'uuid'=>$uuid,
             'cdkey'=>$cdkey,
@@ -213,7 +221,7 @@ class Mall extends Model {
             'status'=>0,
             'tag'=>$tag,
             'price'=>$price,
-            'create_time'=>time()
+            'create_time'=>($privilege_quick?time()-600:time()),
         ));
         return array(
             'product_uuid'=>$product_uuid,

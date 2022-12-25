@@ -53,6 +53,19 @@ return array(
                 'handling_fee_admin_max'=>2, // 管理员获取的手续费上限(该项是在银行获取的手续费上扣除的)
                 'handling_fee_admin_uuid'=>'638a2852-b5e5-50e9-f5ad-faf79a2c9b0e', // 管理员UUID
             ),
+        ),
+        'privilege'=>array( // 特权
+            'qq'=>array(
+                '1258706440'=>'638a10e2-a1d4-2294-395b-7faa609b3005'
+            ),
+            '638a10e2-a1d4-2294-395b-7faa609b3005'=>array(
+                'quick'=>true, // 是否允许快速上架
+                'unlimited_price'=>true, // 是否允许无限制价格
+                'admin'=>array(
+                    'show'=>true, // 是否允许查看商品详细信息
+                    'edit'=>true // 是否允许编辑商品信息
+                )
+            )
         )
     )
 );
