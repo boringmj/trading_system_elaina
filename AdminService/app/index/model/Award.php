@@ -81,7 +81,7 @@ class Award extends Model {
         $money=round(mt_rand($money_min,$money_max)/100,2);
         if($award_info['money']==0)
             throw new Exception("连接已经过期了");
-        if($award_info['money']<$money)
+        if($award_info['money']<$money&&$award_info['money']>0)
             $money=$award_info['money'];
         try {
             // 获取银行的uuid
