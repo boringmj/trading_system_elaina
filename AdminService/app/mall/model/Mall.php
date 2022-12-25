@@ -342,16 +342,17 @@ class Mall extends Model {
                 '购买商品:'.$product['product_name'].'|'.$product['new_cdkey']
             );
             // 将手续费转移到管理员
+            $currency_name=App::getClass('Config')::get('app.config.all.view.currency_name');
             $handling_fee_admin=App::getClass('Config')::get('app.config.all.mall.rule.price.handling_fee_admin');
             $handling_fee_admin_max=App::getClass('Config')::get('app.config.all.mall.rule.price.handling_fee_admin_max');
             $handling_fee=round($product['price']*$handling_fee,2);
             $handling_fee_admin=min(round($handling_fee*$handling_fee_admin,2),$handling_fee_admin_max);
             $Money->transferByUuid($admin_uuid,$bank_uuid,$handling_fee_admin,
-                '交易手续费:'.$product['product_name'].'|'.$product['price'].'兔元'
+                '交易手续费:'.$product['product_name'].'|'.$product['price'].$currency_name
             );
             // 将扣除手续费后的钱转移到商家
             $Money->transferByUuid($product['uuid'],$bank_uuid,$product['price']-$handling_fee,
-                '出售商品:'.$product['product_name'].'|'.$product['price'].'(手续费: '.$handling_fee.'兔元)'
+                '出售商品:'.$product['product_name'].'|'.$product['price'].'(手续费: '.$handling_fee.$currency_name.')'
             );
             // 修改商品状态
             $this->where('product_uuid',$product_uuid)->update(array(
