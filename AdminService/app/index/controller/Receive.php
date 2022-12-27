@@ -68,7 +68,7 @@ class Receive extends Controller {
         try {
             // 通过id获取code
             $Award=new Award();
-            $code=$Award->getAwardInfoById($id);
+            $code=$Award->getAwardInfoById((int)$id);
             $code=$code['code'];
             // 验证签名
             $data=array(
