@@ -7,6 +7,9 @@ use AdminService\App;
 use AdminService\Exception;
 use app\index\model\Award;
 
+// 第三方包
+use Hashids\Hashids;
+
 use function AdminService\common\view;
 
 class Receive extends Controller {
@@ -34,7 +37,10 @@ class Receive extends Controller {
                     'key'=>App::getClass('Config')::get('app.config.all.user.key')
                 );
                 $server_sign=\AdminService\common\sign($data);
-                $goto='/index/receive/check/id/'.$award_info['id'].'/sign'.'/'.$server_sign;
+                $id=$award_info['id'];
+                $Hashids=new Hashids(App::getClass('Config')::get('app.config.all.user.salt'),16);
+                $id=$Hashids->encode($id);
+                $goto='/index/receive/check/id/'.$id.'/sign'.'/'.$server_sign;
                 $this->header('Location',$goto);
                 return '';
             }
@@ -66,6 +72,12 @@ class Receive extends Controller {
             return '';
         }
         try {
+            // 取出id
+            $Hashids=new Hashids(App::getClass('Config')::get('app.config.all.user.salt'),16);
+            $id=$Hashids->decode($id);
+            if(empty($id[0]))
+                throw new Exception('签名错误: 请不要通过其他人的链接领取奖励');
+            $id=$id[0];
             // 通过id获取code
             $Award=new Award();
             $code=$Award->getAwardInfoById((int)$id);
