@@ -10,6 +10,7 @@ use AdminService\model\User;
 use AdminService\model\Money;
 use AdminService\model\Token;
 
+use function AdminService\common\json;
 use function AdminService\common\view;
 
 class View extends Controller {
@@ -277,7 +278,32 @@ class View extends Controller {
             ));
         }
     }
-
+    public function wait_save_money(){
+        $token=$this->param('token');
+        $uuid=$this->param('uuid');
+        $money=$this->param('money');
+        $money=(int)$money;
+        try{
+            $Bank = new Bank();
+            $Bank->saveMoney($token,$uuid,$money);
+            return json(1,'ok',array());
+        }catch(Exception $e){
+            return json(-1,$e->getMessage(),array());
+        }   
+    }
+    public function wait_take_money(){
+        $token=$this->param('token');
+        $uuid=$this->param('uuid');
+        $money=$this->param('money');
+        $money=(int)$money;
+        try{
+            $Bank = new Bank();
+            $Bank->takeMoney($token,$uuid,$money);
+            return json(1,'ok',array());
+        }catch(Exception $e){
+            return json(-1,$e->getMessage(),array());
+        }   
+    }
 }
 
 ?>

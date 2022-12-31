@@ -7,6 +7,48 @@
     <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script>
+        function save_money() {
+            let money = $("#save").val()
+            let data = JSON.stringify({money:money}) 
+    $.ajax({
+        url:"https://www.pivix.cn/index/view/wait_save_money",
+        contentType: "application/json; charset=utf-8",
+        type: "POST",
+        data:data,
+        //dataType:"json",
+        success:function(result){
+        if (result.code == 1 ){
+            alert("提交存款成功");
+            location.reload()
+        }else{
+            alert(result.msg)
+        }
+     }
+    });
+        }
+        function take_money() {
+            let money = $("#take").val()
+            let data = JSON.stringify({money:money}) 
+            $.ajax({
+        url:"https://www.pivix.cn/index/view/wait_take_money",
+        contentType: "application/json; charset=utf-8",
+        type: "POST",
+        data:data,
+        //dataType:"json",
+        success:function(result){
+        if (result.code == 1 ){
+            alert("提交取款成功");
+            location.reload()
+        }else{
+            alert(result.msg)
+        }
+     }
+    });
+        }
+
+    </script>
     <style>
         .user_info {
             margin-bottom: 20px;
@@ -57,10 +99,18 @@
             <span>本金</span><span>{{bank_base_money}} {{currency_name}}</span>
         </div>
         <div class="user_info">
-            <span>待存的钱</span><span>{{bank_wait_save_money}} {{currency_name}}</span>
+            <span>待存的钱</span><span>{{bank_wait_save_money}} {{currency_name}}</span>     
+            <span>
+                <input type="number" min = "1" id="save">
+                <button onclick="save_money()">存钱</button>
+            </span>
         </div>
         <div class="user_info">
             <span>待取的钱</span><span>{{bank_wait_take_money}} {{currency_name}}</span>
+            <span>
+                <input type="number" min = "1" id="take">
+                <button onclick="take_money()">取钱</button>
+            </span>
         </div>
         <div class="user_info">
             <span>银行利息</span><span>{{bank_money_tow}} {{currency_name}} (预期利息: {{bank_money_tow_expected}} {{currency_name}})</span>
@@ -76,4 +126,5 @@
         </div>
         {{list}}
     </div>
+
 </body>

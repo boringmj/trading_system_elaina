@@ -6,6 +6,7 @@ use base\Model;
 use AdminService\Config;
 use AdminService\Exception;
 use AdminService\model\User;
+use AdminService\model\Token;
 
 class Bank extends Model {
 
@@ -72,5 +73,33 @@ class Bank extends Model {
             ));
         }
     }
-
+    public function saveMoney(string $token,string $uuid,int $save_money){
+        $Token=new Token();
+        $token_info=$Token->getTokenInfo($token);
+        if($token_info['uuid']!=$uuid)
+            throw new Exception('用户信息错误');
+        if($save_money <= 0)
+            throw new Exception('存入金额错误');
+        $User=new User();
+        $money=$User->getMoney($uuid);
+        $wait_save_money = $this->where('uuid',$uuid)->find();
+        $allmoney = $save_money + $wait_save_money['wait_save_money'];
+        if($money < $allmoney)
+            throw new Exception('账户余额不足');
+        $this->where('uuid',$uuid)->update(array('wait_save_money'=>$allmoney));
+        
+    }
+    public function takeMoney(string $token,string $uuid,int $take_money){
+        $Token=new Token();
+        $token_info=$Token->getTokenInfo($token);
+        if($token_info['uuid']!=$uuid)
+            throw new Exception('用户信息错误');
+        if($take_money <= 0)
+            throw new Exception('取出金额错误');
+        $bankinfo = $this->where('uuid',$uuid)->find();
+        $allmoney = $take_money + $bankinfo['wait_take_money'];
+        if($bankinfo['money'] < $allmoney)
+            throw new Exception('银行存款不足');
+        $this->where('uuid',$uuid)->update(array('wait_take_money'=>$allmoney));
+    }
 }
