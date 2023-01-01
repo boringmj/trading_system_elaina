@@ -39,7 +39,7 @@ abstract class Controller {
     final public function __construct(?Request $request=null,?View $view=null) {
         $this->request=$request??App::get('Request');
         $this->view=$view??App::get('View');
-        $this->router=$router??App::get('Router');
+        //$this->router=$router??App::get('Router');
     }
 
     /**
