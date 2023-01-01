@@ -59,6 +59,7 @@ return array(
             'sign', // 签名函数
             'http_post', // http post函数
             'cdkey', // 生成cdkey函数
+            'ipaddress',//获取ip地址
         )
     ),
 
