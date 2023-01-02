@@ -83,6 +83,8 @@ final class Router extends BaseRouter {
      * @return array
      */
     public function getRouteInfo(): array {
+        // 如果app为index.php则直接返回默认路由信息
+        $this->uri[0]=null;
         // 这里具体的路由规则将来会随着配置文件的更新而更新,所以现在先这样
         return array(
             "app"=>lcfirst(!empty($this->uri[0])?$this->uri[0]:Config::get('route.default.app')),
