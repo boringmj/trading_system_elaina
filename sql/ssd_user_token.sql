@@ -6,9 +6,9 @@ CREATE TABLE IF NOT EXISTS `ssd_user_token` (
   `id` int unsigned NOT NULL,
   `uuid` varchar(36) NOT NULL,
   `token` varchar(36) NOT NULL,
-  `create_time` int(10) NOT NULL,
-  `expire_time` int(10) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+  `create_time` int  NOT NULL,
+  `expire_time` int  NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Indexes for dumped tables

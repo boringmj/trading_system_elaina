@@ -32,6 +32,7 @@ class Index extends Controller {
     public function online(){
         $token = $this->param('token');
         $necklace_time = $this->param('necklace_time');
+        
         if(!is_numeric($necklace_time)){
             return json(-1, "necklace time error");
         }

@@ -13,7 +13,7 @@ class Money extends Model {
      * 数据库表名
      * @var string
      */
-    public string $table_name='trading_system_elaina_amount_details';
+    public string $table_name='ssd_amount_details';
 
     /**
      * 通过UUID为用户转入一笔交易记录

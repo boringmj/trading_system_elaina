@@ -8,12 +8,12 @@ CREATE TABLE IF NOT EXISTS `ssd_user` (
   `username` varchar(36) NOT NULL,
   `password` varchar(32) NOT NULL,
   `nickname` varchar(36) NOT NULL DEFAULT '',
-  `status` int(1) NOT NULL DEFAULT '1',
-  `money` float(10,2) NOT NULL DEFAULT '0',
-  `event_money` float NOT NULL DEFAULT '0',
+  `status` int NOT NULL DEFAULT 1,
+  `money` DECIMAL(8,2) NOT NULL DEFAULT 0.00,
+  `event_money` DECIMAL(8,2) NOT NULL DEFAULT 0.00,
   `qq` varchar(20) NOT NULL DEFAULT '',
-  `create_time` int(10) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+  `create_time` int  NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Indexes for dumped tables

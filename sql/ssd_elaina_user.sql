@@ -7,7 +7,7 @@ CREATE TABLE `ssd_elaina_user` (
   `game_platform` char(6) DEFAULT NULL,
   `register_name` varchar(100) DEFAULT NULL,
   `current_name` varchar(100) DEFAULT NULL,
-  `register_date` datetime DEFAULT CURRENT_TIMESTAMP,
+  `register_time` datetime DEFAULT CURRENT_TIMESTAMP,
   `login_time` datetime DEFAULT CURRENT_TIMESTAMP,
   `login_ipaddress` varchar(15) DEFAULT NULL,
   PRIMARY KEY (`net_id`),

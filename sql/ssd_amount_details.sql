@@ -6,10 +6,10 @@ CREATE TABLE IF NOT EXISTS `ssd_amount_details` (
   `id` int unsigned NOT NULL,
   `uuid` varchar(36) NOT NULL,
   `from_uuid` varchar(36) NOT NULL,
-  `money` float(10,2) NOT NULL DEFAULT '0',
+  `money` DECIMAL(8,2) NOT NULL DEFAULT 0.00,
   `remark` varchar(255) NULL DEFAULT '',
-  `create_time` int(10) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+  `create_time` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 
 -- Indexes for dumped tables

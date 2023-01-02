@@ -7,13 +7,13 @@ CREATE TABLE IF NOT EXISTS `ssd_bank` (
   `uuid` varchar(36) NOT NULL,
   `qq` varchar(20) DEFAULT NULL,
   `nickname` varchar(36) DEFAULT NULL,
-  `money` float NOT NULL DEFAULT '0',
-  `base_money` float NOT NULL DEFAULT '0',
-  `wait_save_money` float NOT NULL DEFAULT '0',
-  `wait_take_money` float NOT NULL DEFAULT '0',
-  `save_date` int(10) DEFAULT NULL,
-  `take_date` int(10) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+  `money` DECIMAL(8,2) NOT NULL DEFAULT 0.00,
+  `base_money` DECIMAL(8,2) NOT NULL DEFAULT 0.00,
+  `wait_save_money` DECIMAL(8,2) NOT NULL DEFAULT 0.00,
+  `wait_take_money` DECIMAL(8,2) NOT NULL DEFAULT 0.00,
+  `save_date` int  DEFAULT NULL,
+  `take_date` int  DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Indexes for dumped tables
