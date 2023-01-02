@@ -77,9 +77,6 @@ final class Log {
         // 判断日志文件是否存在,如果不存在,则创建日志文件
         if(!is_file($this->log_path))
             file_put_contents($this->log_path,'');
-        // 判断日志文件是否可写
-        if(!is_writable($this->log_path))
-            throw new Exception('日志文件不可写');
         // 判断日志文件大小是否超过最大值
         if(filesize($this->log_path)>Config::get('log.max_size')) {
             $log_path_info=pathinfo($this->log_path);

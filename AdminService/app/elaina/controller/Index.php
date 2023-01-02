@@ -1,6 +1,6 @@
 <?php
 
-namespace app\index\controller;
+namespace app\elaina\controller;
 
 use base\Controller;
 use app\elaina\model\Time;
