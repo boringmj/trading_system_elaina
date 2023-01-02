@@ -5,7 +5,7 @@ namespace app\elaina\model;
 use base\Model;
 use AdminService\Config;
 use AdminService\Exception;
-use AdminService\model\Token;
+use app\elaina\model\Token;
 
 class User extends Model {
 

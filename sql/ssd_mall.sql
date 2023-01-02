@@ -2,7 +2,7 @@
 -- 表的结构 `trading_system_elaina_mall`
 --
 
-CREATE TABLE IF NOT EXISTS `trading_system_elaina_mall` (
+CREATE TABLE IF NOT EXISTS `ssd_mall` (
   `id` int unsigned NOT NULL,
   `uuid` varchar(36) NOT NULL,
   `cdkey` varchar(36) NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `trading_system_elaina_mall` (
 --
 -- Indexes for table `trading_system_elaina_mall`
 --
-ALTER TABLE `trading_system_elaina_mall`
+ALTER TABLE `ssd_mall`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -35,5 +35,5 @@ ALTER TABLE `trading_system_elaina_mall`
 --
 -- AUTO_INCREMENT for table `trading_system_elaina_mall`
 --
-ALTER TABLE `trading_system_elaina_mall`
+ALTER TABLE `ssd_mall`
   MODIFY `id` int unsigned NOT NULL AUTO_INCREMENT;

@@ -32,6 +32,8 @@ class Time extends Model {
         }
         //获取旧的时间信息 
         $time_info = $this->where('net_id', $token_info['net_id'])->find();
+        if (empty($time_info))
+            throw new Exception("找不到时长信息");
         $arr = array(
             'game_time'=>$time_info['game_time'] + floor($time_diff/60),
             'record_time'=>$date

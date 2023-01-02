@@ -2,7 +2,7 @@
 -- 表的结构 `trading_system_elaina_playing_cards_players`
 --
 
-CREATE TABLE IF NOT EXISTS `trading_system_elaina_playing_cards_players` (
+CREATE TABLE IF NOT EXISTS `ssd_playing_cards_players` (
   `id` int unsigned NOT NULL,
   `rmid` varchar(36) NOT NULL,
   `uuid` varchar(36) NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `trading_system_elaina_playing_cards_players` (
 --
 -- Indexes for table `trading_system_elaina_playing_cards_players`
 --
-ALTER TABLE `trading_system_elaina_playing_cards_players`
+ALTER TABLE `ssd_playing_cards_players`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -33,5 +33,5 @@ ALTER TABLE `trading_system_elaina_playing_cards_players`
 --
 -- AUTO_INCREMENT for table `trading_system_elaina_playing_cards_players`
 --
-ALTER TABLE `trading_system_elaina_playing_cards_players`
+ALTER TABLE `ssd_playing_cards_players`
   MODIFY `id` int unsigned NOT NULL AUTO_INCREMENT;

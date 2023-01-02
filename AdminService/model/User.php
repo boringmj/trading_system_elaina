@@ -13,7 +13,7 @@ class User extends Model {
      * 数据库表名
      * @var string
      */
-    public string $table_name='trading_system_elaina_user';
+    public string $table_name='ssd_elaina_user';
 
     /**
      * 将密码加密

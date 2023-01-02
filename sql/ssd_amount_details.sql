@@ -2,7 +2,7 @@
 -- 表的结构 `trading_system_elaina_amount_details`
 --
 
-CREATE TABLE IF NOT EXISTS `trading_system_elaina_amount_details` (
+CREATE TABLE IF NOT EXISTS `ssd_amount_details` (
   `id` int unsigned NOT NULL,
   `uuid` varchar(36) NOT NULL,
   `from_uuid` varchar(36) NOT NULL,
@@ -11,14 +11,14 @@ CREATE TABLE IF NOT EXISTS `trading_system_elaina_amount_details` (
   `create_time` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
---
+-- 
 -- Indexes for dumped tables
 --
 
 --
 -- Indexes for table `trading_system_elaina_amount_details`
 --
-ALTER TABLE `trading_system_elaina_amount_details`
+ALTER TABLE `ssd_amount_details`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -28,5 +28,5 @@ ALTER TABLE `trading_system_elaina_amount_details`
 --
 -- AUTO_INCREMENT for table `trading_system_elaina_amount_details`
 --
-ALTER TABLE `trading_system_elaina_amount_details`
+ALTER TABLE `ssd_amount_details`
   MODIFY `id` int unsigned NOT NULL AUTO_INCREMENT;

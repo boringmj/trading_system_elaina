@@ -2,7 +2,7 @@
 -- 表的结构 `trading_system_elaina_user`
 --
 
-CREATE TABLE IF NOT EXISTS `trading_system_elaina_user` (
+CREATE TABLE IF NOT EXISTS `ssd_user` (
   `id` int unsigned NOT NULL,
   `uuid` varchar(36) NOT NULL,
   `username` varchar(36) NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `trading_system_elaina_user` (
 --
 -- Indexes for table `trading_system_elaina_user`
 --
-ALTER TABLE `trading_system_elaina_user`
+ALTER TABLE `ssd_user`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -32,5 +32,5 @@ ALTER TABLE `trading_system_elaina_user`
 --
 -- AUTO_INCREMENT for table `trading_system_elaina_user`
 --
-ALTER TABLE `trading_system_elaina_user`
+ALTER TABLE `ssd_user`
   MODIFY `id` int unsigned NOT NULL AUTO_INCREMENT;

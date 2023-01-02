@@ -14,7 +14,7 @@ class Award extends Model {
      * 数据库表名
      * @var string
      */
-    public string $table_name='trading_system_elaina_bank_award';
+    public string $table_name='ssd_bank_award';
 
     /**
      * 通过 code 获取奖励信息

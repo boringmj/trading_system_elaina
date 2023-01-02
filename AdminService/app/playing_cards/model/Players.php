@@ -14,7 +14,7 @@ class Players extends Model {
      * 数据库表名
      * @var string
      */
-    public string $table_name='trading_system_elaina_playing_cards_players';
+    public string $table_name='ssd_playing_cards_players';
 
     /**
      * 玩家加入房间

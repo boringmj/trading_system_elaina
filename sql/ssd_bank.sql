@@ -1,8 +1,8 @@
 --
--- 表的结构 `trading_system_elaina_bank`
+-- 表的结构 `ssd_bank`
 --
 
-CREATE TABLE IF NOT EXISTS `trading_system_elaina_bank` (
+CREATE TABLE IF NOT EXISTS `ssd_bank` (
   `id` int unsigned NOT NULL,
   `uuid` varchar(36) NOT NULL,
   `qq` varchar(20) DEFAULT NULL,
@@ -20,9 +20,9 @@ CREATE TABLE IF NOT EXISTS `trading_system_elaina_bank` (
 --
 
 --
--- Indexes for table `trading_system_elaina_bank`
+-- Indexes for table `ssd_bank`
 --
-ALTER TABLE `trading_system_elaina_bank`
+ALTER TABLE `ssd_bank`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -30,7 +30,7 @@ ALTER TABLE `trading_system_elaina_bank`
 --
 
 --
--- AUTO_INCREMENT for table `trading_system_elaina_bank`
+-- AUTO_INCREMENT for table `ssd_bank`
 --
-ALTER TABLE `trading_system_elaina_bank`
+ALTER TABLE `ssd_bank`
   MODIFY `id` int unsigned NOT NULL AUTO_INCREMENT;

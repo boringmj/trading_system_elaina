@@ -18,7 +18,7 @@ class Mall extends Model {
      * 数据库表名
      * @var string
      */
-    public string $table_name='trading_system_elaina_mall';
+    public string $table_name='ssd_mall';
 
     /**
      * 通过cdkey获取商品信息

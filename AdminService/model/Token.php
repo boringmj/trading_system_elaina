@@ -13,7 +13,7 @@ class Token extends Model {
      * 数据库表名
      * @var string
      */
-    public string $table_name='trading_system_elaina_user_token';
+    public string $table_name='ssd_user_token';
 
     /**
      * 为用户创建一个新令牌
