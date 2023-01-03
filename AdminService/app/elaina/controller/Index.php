@@ -1,6 +1,6 @@
 <?php
 
-namespace app\index\controller;
+namespace app\elaina\controller;
 
 use base\Controller;
 use app\elaina\model\Time;
@@ -9,6 +9,39 @@ use AdminService\Exception;
 use function AdminService\common\json;
 
 class Index extends Controller {
+        /**
+     * 校验net_id
+     * 
+     * @access private
+     * @param string $nid
+     * @return bool
+     */
+    private function checkNetId(string $nid):bool{
+        if(strlen($nid) != 20){
+            return true;
+        }
+        if(substr($nid,1,2)!="U_" || !is_numeric(substr($nid,3,17))  ){
+        return true;
+        }
+        return false;
+    }
+    /**
+     * 校验klei_id
+     * 
+     * @access private
+     * @param string $nid
+     * @return bool
+     */
+    private function checkKleiId(string $kid):bool{
+        if(strlen($kid) != 11){
+            return true;
+        }
+        if(substr($kid,0,3) != "KU_"){
+            return true;
+        }
+        return false;
+    }
+    
     public function index() {
         return 'Hello World!';
     }
@@ -20,7 +53,14 @@ class Index extends Controller {
         if ($nid == null) {
             return json(-1, "nid or kid error");
         }
-        
+        //校验net_id
+        if($this->checkNetId($nid))
+            return json(-1, "nid error");
+        // 校验klei_id
+        if(!empty($kid)){
+            if($this->checkKleiId($kid))
+                return json(-1, "kid error");
+        }
         try {
             $User = new User();
             $token = $User->login($kid,$nid,$nickname);

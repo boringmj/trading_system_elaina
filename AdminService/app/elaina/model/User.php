@@ -3,7 +3,6 @@
 namespace app\elaina\model;
 
 use base\Model;
-use AdminService\Config;
 use AdminService\Exception;
 use app\elaina\model\Token;
 
@@ -16,39 +15,6 @@ class User extends Model {
     public string $table_name='ssd_elaina_user';
 
     /**
-     * 校验net_id
-     * 
-     * @access private
-     * @param string $nid
-     * @return bool
-     */
-    private function checkNetId(string $nid):bool{
-        if(strlen($nid) != 20){
-            return true;
-        }
-        if(substr($nid,1,2)!="U_" || !is_numeric(substr($nid,3,17))  ){
-        return true;
-        }
-        return false;
-    }
-    /**
-     * 校验klei_id
-     * 
-     * @access private
-     * @param string $nid
-     * @return bool
-     */
-    private function checkKleiId(string $kid):bool{
-        if(strlen($kid) != 11){
-            return true;
-        }
-        if(substr($kid,0,3) != "KU_"){
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * 用户登录
      * 
      * @access public
@@ -59,14 +25,6 @@ class User extends Model {
      * @throws Exception
      */
     public function login(string $kid,string $nid,string $nickname='',): string {
-        //校验net_id
-        if($this->checkNetId($nid))
-            throw new Exception("net_id不正确");
-        // 校验klei_id
-        if(!empty($kid)){
-            if($this->checkKleiId($kid))
-            throw new Exception("klei_id不正确");
-        }
         // 处理用户登录
         $user_info=$this->where('net_id',$nid)->find(array('net_id'));
         if (empty($user_info))
@@ -98,20 +56,12 @@ class User extends Model {
      * @throws Exception
      */
     public function register(string $kid,string $nid,string $nickname='',): string {
-        // // 校验nei_id
-        // if($this->checkNetId($nid))
-        //     throw new Exception("net_id不正确");
-        // // 校验klei_id
-        // if(!empty($kid)){
-        //     if($this->checkKleiId($kid))
-        //     throw new Exception("klei_id不正确");
-        // }
         if(strcmp(substr($nid, 0, 3),"OU_") == 0){
             $game_platform="steam";
         }else{
             $game_platform="wegame";
         }
-       $ip=\AdminService\common\ipaddress();
+        $ip=\AdminService\common\ipaddress();
         $time = date('Y-m-d H:i:s',time());
         // 保存用户信息
         $this->insert(array(
@@ -120,7 +70,7 @@ class User extends Model {
             'game_platform'=>$game_platform,
             'register_name'=>$nickname,
             'current_name'=>$nickname,
-            'register_date'=>$time,
+            'register_time'=>$time,
             'login_time'=>$time,
             'login_ipaddress'=>$ip
         ));
