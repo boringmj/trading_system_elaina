@@ -33,8 +33,7 @@ class Token extends Model {
         // 生成令牌
         $token=\AdminService\common\uuid(true);
         // 判断是否需要删除旧令牌
-        if(!Config::get('app.config.all.user.token.allow_multiple',false))
-            $this->where('net_id',$nid)->delete();
+        $this->where('net_id',$nid)->delete();
         // 保存新令牌
         $time = date('Y-m-d H:i:s',time());
         $this->insert(array(

@@ -26,19 +26,21 @@ class User extends Model {
      */
     public function login(string $kid,string $nid,string $nickname='',): string {
         // 处理用户登录
-        $user_info=$this->where('net_id',$nid)->find(array('net_id'));
-        if (empty($user_info))
+        $user_info=$this->where('net_id',$nid)->find();
+        if (empty($user_info)){
             return $this->register($kid, $nid, $nickname);
-        
+        }
         $ip=\AdminService\common\ipaddress();
         $time = date('Y-m-d H:i:s',time());
-        $net_id=$user_info['net_id'];
-        $this->where('net_id',$net_id)->update(array(
-                "klei_id"=>$kid,
-                'current_name'=>$nickname,
-                'login_time'=>$time,
-                'login_ipaddress'=>$ip
-            ));
+        $net_id = $user_info['net_id'];
+        $playerinfo = array(
+            'current_name' => $nickname,
+            'login_time' => $time,
+            'login_ipaddress' => $ip
+        );
+        if (empty($user_info['klei_id']))
+            $playerinfo['klei_id'] = $kid;
+        $this->where('net_id',$net_id)->update($playerinfo);
         // 生成令牌
         $Token=new Token();
         return $Token->createToken($kid,$nid);
