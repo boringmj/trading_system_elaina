@@ -32,7 +32,7 @@ return array(
             '638a10e2-a1d4-2294-395b-7faa609b3005'
         ),
         'interest'=>array(
-            'rate'=>0.005, // 利率
+            'rate'=>0.001, // 利率
             'date_min'=>7, // 最小存款天数(利息按天结算)
         )
     ),
