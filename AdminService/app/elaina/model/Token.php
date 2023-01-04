@@ -90,5 +90,15 @@ class Token extends Model {
                         'expire_time' =>$token_info['expire_time'] - $diff_time
                     ));
     }
-
+    /**
+     * 清理过期token
+     * 
+     * @access public
+     * @return void
+     * @throws Exception
+     */
+    public function cleanExpireToken(): void {
+        $time = date("Y-m-d H:i:s",time() + 4800);
+        $this->table('ssd_elaina_skins_temp')->where('expire_time',$time,'<')->delete();
+    }
 }
