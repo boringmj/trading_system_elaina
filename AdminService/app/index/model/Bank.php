@@ -55,7 +55,7 @@ class Bank extends Model {
             `bank`.`money`as`bank_money`,`bank`.`base_money`,`bank`.`wait_save_money`,`bank`.`wait_take_money`,
             `bank`.`save_date`,`bank`.`take_date`
             FROM `{$this->table_name}` `bank`
-            LEFT JOIN `trading_system_elaina_user` `user` ON `bank`.`uuid`=`user`.`uuid`
+            LEFT JOIN `ssd_user` `user` ON `bank`.`uuid`=`user`.`uuid`
             WHERE {$filter}
         ";
         try {
