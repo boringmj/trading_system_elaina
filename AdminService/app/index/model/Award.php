@@ -69,7 +69,7 @@ class Award extends Model {
         if($award_info['check']!==0&&$check==false)
             throw new Exception("非法操作");
         // 判断是否已经领取
-        $user_award_info=$this->table('trading_system_elaina_bank_award_find')->where('uuid',$uuid)->where('pid',$award_info['id'])->find();
+        $user_award_info=$this->table('ssd_bank_award_find')->where('uuid',$uuid)->where('pid',$award_info['id'])->find();
         $currency_name=App::getClass('Config')::get('app.config.all.view.currency_name');
         if(!empty($user_award_info))
             throw new Exception("您已经领取过了<br>于 ".date('Y-m-d H:i:s',$user_award_info['create_time'])."<br>领取 <b>{$user_award_info['money']}</b> {$currency_name}");
@@ -93,7 +93,7 @@ class Award extends Model {
             throw new Exception($e->getMessage());
         }
         // 记录领取记录
-        $this->table('trading_system_elaina_bank_award_find')->insert([
+        $this->table('ssd_bank_award_find')->insert([
             'uuid'=>$uuid,
             'pid'=>$award_info['id'],
             'money'=>$money,
