@@ -1,11 +1,10 @@
 <?php
 
 namespace app\elaina\controller;
-
-use app\elaina\model\Cdkey;
-use app\elaina\model\Token;
 use base\Controller;
 use app\elaina\model\User;
+use app\elaina\model\Cdkey;
+use app\elaina\model\Token;
 use app\elaina\model\Time;
 use app\elaina\model\Skins;
 use AdminService\Exception;
@@ -86,7 +85,14 @@ class Index extends Controller {
         try {
             $User = new User();
             $token = $User->login($kid,$nid,$nickname);
-            return json(1,'ok',array('token'=>$token));
+            $Time = new Time();
+            $timeinfo = $Time->getTime($nid);
+            return json(1,'ok',array(
+                'token'=>$token,
+                'game_time'=>$timeinfo['game_time'],
+                'necklace_time'=>$timeinfo['necklace_time']
+
+            ));
         } catch (Exception $e) {
             return json(-1,$e->getMessage());
         }
@@ -175,10 +181,10 @@ class Index extends Controller {
             $Skins = new Skins();
             if($skin === 'elaina_hl'){
                 $data = $Skins->ActiveHl($userinfo['klei_id'], $userinfo['net_id']);
-                return json(1, 'ok', $data);
+                return json(1, 'ok',array($data));
             }else{
                 $data = $Skins->ActiveHj($userinfo['klei_id'], $userinfo['net_id']);
-                return json(1, 'ok', $data);
+                return json(1, 'ok', array($data));
             }
         }catch (Exception $e){
             return json(-1,$e->getMessage());

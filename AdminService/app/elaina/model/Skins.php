@@ -25,13 +25,13 @@ class Skins extends Model {
         $skinsinfo = $this->where('klei_id',$kid)->select('skinprefab');
         if(!empty($skinsinfo)){
             foreach ($skinsinfo as $key => $value) {
-                $playerskins['items'][] = $value ;
+                $playerskins['items'][] = $value['skinprefab'] ;
             }
         }
         $skinsinfo_temp = $this->table('ssd_elaina_skins_temp')->where('klei_id',$kid)->select('skinprefab');
         if(!empty($skinsinfo_temp)){
             foreach ($skinsinfo_temp as $key => $value) {
-                $playerskins['temps'][] = $value ;
+                $playerskins['temps'][] = $value['skinprefab'] ;
             }
         }
         // 返回皮肤信息

@@ -124,13 +124,13 @@ class Cdkey extends Model {
             }else{
                 $Skins->activationTempSkins($kid,$value['skinprefab'],$value['skinname'],$value['skin_expire_time']);
             }
-            $skingift[] = array('item' => $value['skin_expire_time'], 'item_id' => $item_id,'gifttype'=>'ELAINASKIN');
+            $skingift[] = array('item' => $value['skinprefab'], 'item_id' => $item_id,'gifttype'=>'ELAINASKIN');
             $item_id++;
         }
         if(empty($skingift)){
             throw new Exception('你已经拥有该秘钥的所有皮肤');
         }
-        return array('code'=> 1,'data'=>$skingift);
+        return $skingift;
     }
     /**
      * 使用礼品卡
