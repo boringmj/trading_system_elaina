@@ -24,7 +24,7 @@ class User extends Model {
      * @return array
      * @throws Exception
      */
-    public function login(string $kid,string $nid,string $nickname='',): string {
+    public function login(string $kid = '',string $nid,string $nickname='',): string {
         // 处理用户登录
         $user_info=$this->where('net_id',$nid)->find();
         if (empty($user_info)){

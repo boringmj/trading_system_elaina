@@ -73,6 +73,7 @@ class Index extends Controller {
     {
         $nid = $this->param('nid');
         $kid = $this->param('kid') == $nid ? '' : $this->param('kid');
+        $kid = $kid ?? '';
         $nickname = $this->param('name')??'';
         //校验net_id
         if($this->checkNetId($nid))

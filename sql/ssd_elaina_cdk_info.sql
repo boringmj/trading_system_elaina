@@ -1,5 +1,6 @@
 -- ssd.ssd_elaina_cdkey_skin definition
 
+
 CREATE TABLE `ssd_elaina_cdkey_info` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `cdk` char(25) DEFAULT NULL,

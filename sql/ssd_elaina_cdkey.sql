@@ -5,7 +5,7 @@ CREATE TABLE `ssd_elaina_cdkey` (
   `cdk` char(25) DEFAULT NULL,
   `value` int DEFAULT -1 COMMENT '价值,-1为正常皮肤',
   `type` tinyint DEFAULT 0 COMMENT '类型,默认0普通皮肤',
-  `lock` tinyint(1) DEFAULT 0 COMMENT '锁定,商店相关',
+  `lock` tinyint DEFAULT 0 COMMENT '锁定,商店相关',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP,
   `cdk_expire_time` int DEFAULT 30 COMMENT 'cdk失效时间(天)',
   `remark` varchar(255) DEFAULT NULL COMMENT '备注',
