@@ -143,7 +143,7 @@ class Cdkey extends Model {
     public function getRabbitYuan(string $kid, string $nid): array {
         $cardinfo = $this->table('ssd_elaina_cdkey_info')->where('cdk', $this->cdk)->select();
         foreach ($cardinfo as $value) {
-            if ($value === $kid)
+            if ($value['user_kid'] === $kid)
                 throw new Exception('这张卡密已经被你使用过了');
         }
         //获取用户uuid信息
@@ -160,8 +160,9 @@ class Cdkey extends Model {
                 'use_time'=>$time
             )
         );
-        $Money->transferByUuid($userinfo['uuid'], $system_uuid, $this->value);
+        $Money->transferByUuid($userinfo['uuid'], $system_uuid, $this->value,strval($this->value).'兔元礼品卡');
         //返回礼物信息
+
         return array('item' => 'rabbityuan', 'item_id' => 0,'gifttype'=>'ELAINASKIN');
     }
     /**
