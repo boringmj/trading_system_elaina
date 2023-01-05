@@ -23,6 +23,7 @@ return array(
     'system'=>array(
         'uuid'=>array(
             'bank'=>'63986dfe-4444-4444-4444-444444444444', // 银行UUID
+            'system_user'=>'63969c0a-1111-1111-1111-111111111111'//系统用户UUID
         )
     ),
     'bank'=>array(
