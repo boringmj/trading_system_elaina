@@ -59,6 +59,7 @@ class Token extends Model {
         // 获取用户信息
         $token_info=array();
         $token_info=$this->where('token',$token)->find();
+        
         // 检查令牌是否过期
         if(empty($token_info))
             throw new Exception('令牌不存在,请重新登录');

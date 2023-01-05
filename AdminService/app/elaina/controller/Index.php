@@ -2,9 +2,12 @@
 
 namespace app\elaina\controller;
 
+use app\elaina\model\Cdkey;
+use app\elaina\model\Token;
 use base\Controller;
+use app\elaina\model\User;
 use app\elaina\model\Time;
-use  app\elaina\model\User;
+use app\elaina\model\Skins;
 use AdminService\Exception;
 use function AdminService\common\json;
 
@@ -41,7 +44,28 @@ class Index extends Controller {
         }
         return false;
     }
-    
+    /**
+     * 校验cdk
+     * 
+     * @access private
+     * @param string $cdk
+     * @return bool
+     */
+    private function checkCdk(string $cdk):bool{
+        $cdk = preg_replace('/[^A-Za-z0-9-]/','',$cdk);
+        if (!$cdk) {
+            return true;
+        }
+        if (strlen($cdk) != 23) {
+            return true;
+        }
+        for ($x = 5; $x < 23; $x += 6) {
+            if (strcmp(substr($cdk, $x, 1), "-") != 0) {
+                return true;
+            }
+        }
+        return false;
+    } 
     public function index() {
         return 'Hello World!';
     }
@@ -49,10 +73,7 @@ class Index extends Controller {
     {
         $nid = $this->param('nid');
         $kid = $this->param('kid') == $nid ? '' : $this->param('kid');
-        $nickname = $this->param('name');
-        if ($nid == null) {
-            return json(-1, "nid or kid error");
-        }
+        $nickname = $this->param('name')??'';
         //校验net_id
         if($this->checkNetId($nid))
             return json(-1, "nid error");
@@ -69,6 +90,7 @@ class Index extends Controller {
             return json(-1,$e->getMessage());
         }
     }
+    
     public function online(){
         $token = $this->param('token');
         $necklace_time = $this->param('necklace_time');
@@ -87,6 +109,78 @@ class Index extends Controller {
         }catch (Exception $e) {
             return json(-1,$e->getMessage());
         }
-        
+    } 
+    public function getskins(){
+        $kid = $this->param('kid');  
+        if($this->checkKleiId($kid)){
+            return json(-1,'klei_id error');
+        }
+        try{
+            $Skins = new Skins();
+            $skininfo = $Skins->getSkins($kid);
+            return json(1, 'ok', $skininfo);
+        }catch (Exception $e) {
+            return json(-1,$e->getMessage());
+        }
+       
+    }
+    public function usecdk(){
+        $token = $this->param('token');
+        $cdk = $this->param('cdk');
+        if($this->checkCdk($cdk)){
+            return json(-1,'卡密不正确 请重新输入');
+        }
+        try{
+            $Token = new Token();
+            $userinfo = $Token->getTokenInfo($token);
+            $Cdkey = new Cdkey();
+            $Cdkey->cdkInit($cdk);
+            $cdktype = $Cdkey->getCdkType();
+            if($cdktype != 2){
+                if (empty($userinfo['klei_id'])){
+                    throw new Exception('您当前处于离线状态,无法激活该秘钥');
+                }
+            }
+            switch ($cdktype) {
+                case 0:
+                    $Cdkey->tryUseCdkey();
+                    $data = $Cdkey->useCdk($userinfo['klei_id']);
+                    return json(1,'ok',$data);
+                case 1:
+                    $Cdkey->tryUseCdkey();
+                    $data = $Cdkey->getRabbitYuan($userinfo['klei_id'], $userinfo['net_id']);
+                    return json(1,'ok',$data);
+                case 2:
+                    $msg = $Cdkey->bindQQ($userinfo['klei_id'], $userinfo['net_id']);
+                    return json(2,$msg);
+                default:
+                    return json(-1,'秘钥异常');
+            }
+
+        }catch (Exception $e){
+            return json(-1,$e->getMessage());
+        }
+    }
+
+    public function activeskin(){
+        $skin = $this->param('skin');
+        $token = $this->param('token');
+        try {
+            $Token = new Token();
+            $userinfo = $Token->getTokenInfo($token);
+            if (empty($userinfo['klei_id'])){
+                throw new Exception('您当前处于离线状态,无法激活该秘钥');
+            }
+            $Skins = new Skins();
+            if($skin === 'elaina_hl'){
+                $data = $Skins->ActiveHl($userinfo['klei_id'], $userinfo['net_id']);
+                return json(1, 'ok', $data);
+            }else{
+                $data = $Skins->ActiveHj($userinfo['klei_id'], $userinfo['net_id']);
+                return json(1, 'ok', $data);
+            }
+        }catch (Exception $e){
+            return json(-1,$e->getMessage());
+        }
     }
 }

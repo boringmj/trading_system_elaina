@@ -13,7 +13,7 @@ class Time extends Model {
     public string $table_name='ssd_elaina_time';
 
     /**
-     * 获取用户时长信息
+     * 记录用户时长信息
      * 
      * @access public
      * @param string $nid 用户NetID
@@ -46,5 +46,19 @@ class Time extends Model {
         $this->where('net_id', $token_info['net_id'])->update($arr);
         // 返回时长信息
         return $arr;
+    }
+    /**
+     * 获取用户时长信息
+     * 
+     * @access public
+     * @param string $nid 用户NetID
+     * @return array
+     * @throws Exception
+     */
+    public function getTime(string $nid){
+        $time_info = $this->where('net_id', $nid)->find();
+        if (empty($time_info))
+            throw new Exception("找不到时长信息");
+        return $time_info;
     }
 }
