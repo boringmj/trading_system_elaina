@@ -89,12 +89,12 @@ class Skins extends Model {
      * @throws Exception
      */
     public function activationTempSkins(string $kid,string $skinprefab,string $skinname = '未知',int $effect_time = 604800,int $type = 0): void {
-        $skininfo = $this->table('ssd_elaina_skins_temp')->where('skinprefab', $skinprefab)->where('keli_id', $kid)->find();
+        // $skininfo = $this->table('ssd_elaina_skins_temp')->where('skinprefab', $skinprefab)->where('klei_id', $kid)->find();
         $expire_time = time() + $effect_time * 24 * 3600 ;
-        if(!empty($skininfo)){
-            $expire_time = strtotime($skininfo['expire_time'])  + $effect_time;
-            $this->table('ssd_elaina_skins_temp')->where('skinprefab', $skinprefab)->where('keli_id', $kid)->delete();
-        }
+        // if(!empty($skininfo)){
+        //     $expire_time = strtotime($skininfo['expire_time'])  + $effect_time;
+        //     $this->table('ssd_elaina_skins_temp')->where('skinprefab', $skinprefab)->where('keli_id', $kid)->delete();
+        // }
         $this->table('ssd_elaina_skins_temp')->insert(array(
             'skinprefab'=>$skinprefab,
             'skinname'=>$skinname,
@@ -103,7 +103,6 @@ class Skins extends Model {
             'expire_time' => date("Y-m-d H:i:s",$expire_time)
         ));
     }
-
     /**
      * 激活海拉
      * 

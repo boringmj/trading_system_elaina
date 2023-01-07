@@ -27,8 +27,9 @@ class Time extends Model {
         $time_diff = $time - strtotime($token_info['effect_time']);
         $date = date('Y-m-d H:i:s',$time);
         if ($time_diff > 644){
-            $Token->updateTokenInfo($token,$time_diff);
+            $Token->updateTokenInfo($token,$time_diff); 
             throw new Exception("两次活跃时差过大");
+            
         }
         //获取旧的时间信息 
         $time_info = $this->where('net_id', $token_info['net_id'])->find();
