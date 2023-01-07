@@ -23,7 +23,7 @@ class Token extends Model {
      * @return string
      * @throws Exception
      */
-    public function createToken(string $kid = '',string $nid): string {
+    public function createToken(string $kid,string $nid): string {
         // 检查用户真实性(防止无意义的令牌生成)
         if(Config::get('app.config.all.user.token.check',false)||Config::get('app.config.all.user.check',false)) {
             $User=new User();
