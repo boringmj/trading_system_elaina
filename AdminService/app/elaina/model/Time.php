@@ -28,8 +28,9 @@ class Time extends Model {
         $date = date('Y-m-d H:i:s',$time);
         if ($time_diff > 644){
             $Token->updateTokenInfo($token,$time_diff); 
-            throw new Exception("两次活跃时差过大");
-            
+            //throw new Exception("两次活跃时差过大");
+            $time_info = $this->getTime($token_info['net_id']);
+            return $time_info;
         }
         //获取旧的时间信息 
         $time_info = $this->where('net_id', $token_info['net_id'])->find();
@@ -40,9 +41,9 @@ class Time extends Model {
             'record_time'=>$date
         );
         //上传项链时长小于10分钟,允许更新时长
-        if($necklace_time < 644){
+        if($necklace_time <= 10){
             $arr['necklace_time'] = $time_info['necklace_time'] +  
-           floor($necklace_time/60) ;
+           floor($necklace_time) ;
         }
         $this->where('net_id', $token_info['net_id'])->update($arr);
         // 返回时长信息

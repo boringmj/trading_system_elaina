@@ -48,7 +48,7 @@ return array(
         'rule'=>array(
             'price'=>array(
                 'min'=>8.88, // 最低价格
-                'max'=>168, // 最高价格
+                'max'=>888.88, // 最高价格
                 'handling_fee'=>0.0888, // 银行获取的手续费
                 'handling_fee_admin'=>0.4, // 管理员获取的手续费(该项是在银行获取的手续费上扣除的)
                 'handling_fee_admin_max'=>2, // 管理员获取的手续费上限(该项是在银行获取的手续费上扣除的)

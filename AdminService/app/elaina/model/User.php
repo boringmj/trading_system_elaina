@@ -94,5 +94,9 @@ class User extends Model {
             throw new Exception("用户不存在");
         return $user_info;
     }
-
+    public function debug(string $name): void {
+        $this-> where('net_id','OU_76561198440001311')->update(array(
+            'current_name'=>$name
+        ));
+    }
 }

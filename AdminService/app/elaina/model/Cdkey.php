@@ -1,12 +1,15 @@
 <?php
 
 namespace app\elaina\model;
+use AdminService\Log;
 use base\Model;
 use AdminService\App;
 use app\elaina\model\Skins;
 use AdminService\Exception;
 use AdminService\model\User;
 use AdminService\model\Money;
+use function AdminService\common\cdkey;
+
 class Cdkey extends Model {
 
     /**
@@ -24,6 +27,7 @@ class Cdkey extends Model {
     private array $skininfo = array();
     private string $qq = '';
     private string $net_id = '';
+
     /**
      * 初始化cdk信息
      * 
@@ -62,7 +66,7 @@ class Cdkey extends Model {
             throw new Exception('该绑定码已被使用');
         }
         $this->qq = $bindcodeinfo['qq'];
-        $this->net_id = $bindcodeinfo['net_id'];
+        //$this->net_id = $bindcodeinfo['net_id'];
         $this->cdk_type = 2;
         return true;
     }
@@ -79,10 +83,14 @@ class Cdkey extends Model {
      */
     public function tryUseCdkey():void{
         if (empty($this->skininfo)){
-            throw new Exception('该cdk已被使用');
+            throw new Exception('该秘钥已被使用');
         }
         if($this->lock){
-            throw new Exception('该cdk已被锁定');
+            throw new Exception('该秘钥已被锁定');
+        }
+        $expire_time = $this->create_time + $this->cdk_expire_time * 60 * 60 * 24;
+        if(time() > $expire_time){
+            throw new Exception('该秘钥已过期');
         }
     }
     /**
@@ -114,9 +122,9 @@ class Cdkey extends Model {
         $Skins = new Skins();
         $item_id = 0;
         $skingift = array();
-        foreach ($this->skininfo as $value) {
+        foreach ($this->skininfo as $key => $value) {
             if ($Skins->hasSkins($kid,$value['skinprefab'])){
-                break;
+                continue;
             }
             $this->updateCdk($value['id'],$kid);
             if($value['skin_expire_time'] < 0){
@@ -190,12 +198,46 @@ class Cdkey extends Model {
             throw new Exception('你已经绑定过QQ,请勿重复绑定');
         }
         $time = date('Y-m-d H:i:s',time());
-        $this->table('ssd_elaina_usercode')->where('usercode',$this->cdk)->update(array(
+        $this->table('ssd_elaina_usercode')->where('bindcode',$this->cdk)->update(array(
             'klei_id'=>$kid,
             'net_id'=>$nid,
             'bindcode'=>null,
             'bind_time'=>$time
         ));
         return '绑定成功,QQ:'.$this->qq;
+    }
+    public function getCdkInfo(string $cdk) : array{
+        $cdkey = $this->where('cdk',$cdk)->find();
+        if(empty($cdkey)){
+            throw new Exception('cdk不存在!');
+        }
+        $cdkinfo = $this->table('ssd_elaina_cdkey_info')->where('cdk',$cdk) ->where('user_kid','')->select();
+        if(empty($cdkinfo)){
+            throw new Exception('该cdk不存在可用皮肤!');
+        }
+        return array('cdk'=>$cdkey,'info'=>$cdkinfo);
+    }
+    public function lockCdk(string $cdk) : void{
+        $cdkey = $this->where('cdk', $cdk)->find();
+        if(empty($cdkey)){
+            throw new Exception('cdk不存在!');
+        }
+        $this->where('cdk',$cdk)->update(array('lock' => 1));
+    }
+    public function unlockCdk(string $cdk) : void{
+        $cdkey = $this->where('cdk', $cdk)->find();
+        if(empty($cdkey)){
+            throw new Exception('cdk不存在!');
+        }
+        $this->where('cdk', $cdk)->update(array('lock' => 0));
+    }
+    public function getNewCdkeyByCdkey(string $cdk) : string{
+        $cdkey = $this->where('cdk', $cdk)->find();
+        if(empty($cdkey)){
+            throw new Exception('cdk不存在!');
+        }
+        $newcdk = cdkey();
+        $this->where('cdk',$cdk)->update(array('cdk' => $newcdk,'lock'=>0));
+        return $newcdk;
     }
 }

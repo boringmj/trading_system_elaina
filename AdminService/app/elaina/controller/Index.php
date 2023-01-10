@@ -87,6 +87,9 @@ class Index extends Controller
         $kid = $this->param('kid') == $nid ? '' : $this->param('kid');
         $kid = $kid ?? '';
         $nickname = $this->param('name') ?? '';
+        preg_match_all('/([a-zA-Z0-9_\x{4e00}-\x{9fa5}])+/u', $nickname, $data);
+        // 将结果的第一个字符集合并
+        $nickname = implode($data[0]??[])??'';
         //校验net_id
         if ($this->checkNetId($nid))
             return json(-1, "nid error");
@@ -98,7 +101,10 @@ class Index extends Controller
         try {
             $User = new User();
             $token = $User->login($kid, $nid, $nickname);
-            return json(1, 'ok', array('token' => $token));
+            $Time = new Time();
+            $timeinfo = $Time->getTime($nid);
+            $data = array('token' => $token,'game_time'=>$timeinfo['game_time'],'necklace_time'=>$timeinfo['necklace_time']);
+            return json(1, 'ok', $data);
         } catch (Exception $e) {
             return json(-1, $e->getMessage());
         }
@@ -112,7 +118,6 @@ class Index extends Controller
         if (!is_numeric($necklace_time)) {
             return json(-1, "necklace time error");
         }
-
         try {
             $Time = new Time();
             $timeinfo = $Time->recordTime($token, $necklace_time);
@@ -142,8 +147,8 @@ class Index extends Controller
     {
         $token = $this->param('token')??'';
         $cdk = $this->param('cdk')??'';
-        $log=new Log("debug");
-        $log->write($cdk);
+        // $log=new Log("usingcdk");
+        // $log->write($cdk);
         if ($this->checkCdk($cdk)) {
             return json(-1, '卡密不正确,请重新输入');
         }
@@ -203,7 +208,23 @@ class Index extends Controller
 
 
 
+    public function debug()
+    {        
 
+        $name = '󰀒九轩󰀒';
+        // $log=new Log("skins");
+        // $a =base64_encode($name);
+        // $log->write($a);
+        // $log->write($name);
+        
+        // PHP通过正则表达式
+        preg_match_all('/([a-zA-Z0-9_\x{4e00}-\x{9fa5}])+/u', $name, $data);
+        // 将结果的第一个字符集合并
+        $name = implode($data[0]??[]);
+        $User = new User;
+        $User->debug($name);
+        return json(1, 'ok', array());
+    }
 
 
     public function getplayerlist()

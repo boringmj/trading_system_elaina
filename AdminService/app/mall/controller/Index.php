@@ -48,12 +48,12 @@ class Index extends Controller {
         }
     }
 
-    public function test() {
-        $cdk=$this->param('cdk','');
-        $Mall=new Mall();
-        $Mall->getInfoByCdkey($cdk);
-        return json(null,null,$Mall->getNewCdkeyByCdkey($cdk));
-    }
+    // public function test() {
+    //     $cdk=$this->param('cdk','');
+    //     $Cdk=new Mall();
+    //     $Mall->getInfoByCdkey($cdk);
+    //     return json(null,null,$Mall->getNewCdkeyByCdkey($cdk));
+    // }
 
     public function info() {
         $product_uuid=$this->param('product_uuid','');

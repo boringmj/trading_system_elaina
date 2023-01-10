@@ -2,6 +2,8 @@
 
 namespace app\mall\model;
 
+use AdminService\Log;
+use app\elaina\model\Cdkey;
 use base\Model;
 use AdminService\App;
 use AdminService\Exception;
@@ -9,8 +11,7 @@ use AdminService\model\User;
 use AdminService\model\Money;
 use AdminService\model\Token;
 
-use function AdminService\common\sign;
-use function AdminService\common\httpPost;
+
 
 class Mall extends Model {
 
@@ -20,39 +21,6 @@ class Mall extends Model {
      */
     public string $table_name='ssd_mall';
 
-    /**
-     * 通过cdkey获取商品信息
-     * 
-     * @access public
-     * @param string $cdkey
-     * @param bool $lock 是否锁定商品
-     * @return array
-     * @throws Exception
-     */
-    public function getInfoByCdkey(string $cdkey,bool $lock=false): array {
-        $url=App::getClass('Config')::get('app.config.all.mall.cdkey_verify_url');
-        $data=array(
-            'cdk'=>$cdkey,
-            'lock'=>$lock?'y':'n',
-            'token'=>App::getClass('Config')::get('app.config.all.user.key')
-        );
-        $sign=sign($data);
-        $data['token']=$sign;
-        $result=httpPost($url,$data,'json');
-        $result=json_decode($result,true);
-        App::get('Log')->write('{url} | {cdk} | {sign} | {data} | {result}',array(
-            'url'=>$url,
-            'cdk'=>$cdkey,
-            'sign'=>$sign,
-            'data'=>$data,
-            'result'=>$result
-        ));
-        if(empty($result))
-            throw new Exception('获取商品信息失败');
-        if($result['code']!=1)
-            throw new Exception($result['msg']);
-        return $result;
-    }
 
     /**
      * 通过旧的cdkey换取新的cdkey
@@ -62,61 +30,12 @@ class Mall extends Model {
      * @return array
      * @throws Exception
      */
-    public function getNewCdkeyByCdkey(string $cdkey): array {
-        $url=App::getClass('Config')::get('app.config.all.mall.cdkey_replacecdk_url');
-        $data=array(
-            'cdk'=>$cdkey,
-            'token'=>App::getClass('Config')::get('app.config.all.user.key')
-        );
-        $sign=sign($data);
-        $data['token']=$sign;
-        $result=httpPost($url,$data,'json');
-        $result=json_decode($result,true);
-        App::get('Log')->write('{url} | {cdk} | {sign} | {data} | {result}',array(
-            'url'=>$url,
-            'cdk'=>$cdkey,
-            'sign'=>$sign,
-            'data'=>$data,
-            'result'=>$result
-        ));
-        if(empty($result))
-            throw new Exception('获取新的CDKEY失败');
-        if($result['code']!=1)
-            throw new Exception($result['msg']);
+    public function getNewCdkeyByCdkey(string $cdkey): string {
+        $Cdkey = new Cdkey();
+        $result = $Cdkey->getNewCdkeyByCdkey($cdkey);
         return $result;
     }
 
-    /**
-     * 解除CDKEY锁定
-     * 
-     * @access public
-     * @param string $cdkey
-     * @return array
-     * @throws Exception
-     */
-    public function unlockCdkey(string $cdkey): array {
-        $url=App::getClass('Config')::get('app.config.all.mall.cdkey_unlock_url');
-        $data=array(
-            'cdk'=>$cdkey,
-            'token'=>App::getClass('Config')::get('app.config.all.user.key')
-        );
-        $sign=sign($data);
-        $data['token']=$sign;
-        $result=httpPost($url,$data,'json');
-        $result=json_decode($result,true);
-        App::get('Log')->write('{url} | {cdk} | {sign} | {data} | {result}',array(
-            'url'=>$url,
-            'cdk'=>$cdkey,
-            'sign'=>$sign,
-            'data'=>$data,
-            'result'=>$result
-        ));
-        if(empty($result))
-            throw new Exception('解除CDKEY锁定失败');
-        if($result['code']!=1)
-            throw new Exception($result['msg']);
-        return $result;
-    }
 
     /**
      * 下架一个商品
@@ -132,7 +51,8 @@ class Mall extends Model {
         if(empty($product))
             throw new Exception('商品不存在');
         // 解除CDKEY锁定
-        $this->unlockCdkey($product['cdkey']);
+        $Cdkey = new Cdkey();
+        $Cdkey->unlockCdk($product['cdkey']);
         $this->where('product_uuid',$product_uuid)->update(array(
             'status'=>4,
             'update_time'=>time()
@@ -204,20 +124,47 @@ class Mall extends Model {
             throw new Exception('用户状态异常');
         $uuid=$user['uuid'];
         // 获取商品信息
-        $info=$this->getInfoByCdkey($cdkey);
-        $info=$info['data'];
+        $sp = $this->where('cdkey', $cdkey)->where('status',2,'<')->find();
+        if(!empty($sp)){
+            throw new Exception('重复上架');
+        }
+        $Cdkey = new Cdkey();
+        $info = $Cdkey->getCdkInfo($cdkey);
         // 判断cdkey是否已经锁定
-        if($info['status']!=1)
-            throw new Exception('CDKEY状态异常');
+        if($info['cdk']['lock']===1)
+            throw new Exception('CDKEY已被锁定');
+        if($info['cdk']['type'] != 1){
+            throw new Exception('该cdk不能上架商店');
+        }
+        $exp_time = strtotime($info['cdk']['create_time']) + $info['cdk']['cdk_expire_time'] * 24 * 60 * 60;
+        if(time() > $exp_time){
+            throw new Exception('该cdk已过期');
+        }
+        foreach ($info['info'] as $key => $value) {
+            if($value['skin_expire_time'] != -1){
+                throw new Exception('cdk中包含限时皮肤,不能上架');
+            }
+        }
         $product_uuid=\AdminService\common\uuid(true);
         // 上架商品
         $privilege_quick=App::getClass('Config')::get('app.config.all.mall.privilege.'.$uuid.'.quick',false);
+        $skins = "" ;
+        if(count($info['info']) > 1){
+            foreach ($info['info'] as $key => $value) {
+                $skins .= "," . $value['skinname'];
+            }
+        }
+        if($tag === ''){
+            $tag = substr($skins, 1);
+        }else{
+            $tag .= $skins;
+        }
         $this->insert(array(
             'uuid'=>$uuid,
             'cdkey'=>$cdkey,
             'product_uuid'=>$product_uuid,
-            'product_name'=>$info['skinname'],
-            'product_code'=>$info['skinprefab'],
+            'product_name'=>$info['info'][0]['skinname'],
+            'product_code'=>$info['info'][0]['skinprefab'],
             'status'=>0,
             'tag'=>$tag,
             'price'=>$price,
@@ -225,8 +172,8 @@ class Mall extends Model {
         ));
         return array(
             'product_uuid'=>$product_uuid,
-            'product_name'=>$info['skinname'],
-            'product_code'=>$info['skinprefab'],
+            'product_name'=>$info['info'][0]['skinname'],
+            'product_code'=>$info['info'][0]['skinprefab'],
             'price'=>$price
         );
     }
@@ -335,7 +282,8 @@ class Mall extends Model {
         if($money<$product['price'])
             throw new Exception('余额不足');
         // 获取一个新的cdkey
-        $product['new_cdkey']=$this->getNewCdkeyByCdkey($product['cdkey'])['data']['cdk'];
+        $Cdkey = new Cdkey();
+        $product['new_cdkey']=$Cdkey->getNewCdkeyByCdkey($product['cdkey']);
         // $product['new_cdkey']=$product['cdkey'];
         $Money=new Money();
         // 开启事务
@@ -391,16 +339,12 @@ class Mall extends Model {
         $product_array=$this->where('status',0)->where('create_time',time()-600,'<')->select(array('product_uuid','cdkey'));
         foreach($product_array as $product) {
             try {
-                $info=$this->getInfoByCdkey($product['cdkey'],true);
-                $info=$info['data'];
-                if($info['status']==1) {
-                    $this->where('product_uuid',$product['product_uuid'])->where('status',0)->update(array(
-                        'status'=>1,
-                        'update_time'=>time()
-                    ));
-                } else {
-                    throw new Exception('商品状态异常');
-                }
+                $Cdkey = new Cdkey();
+                $Cdkey->lockCdk($product['cdkey']);
+                $this->where('product_uuid',$product['product_uuid'])->where('status',0)->update(array(
+                    'status'=>1,
+                    'update_time'=>time()
+                ));
             } catch(Exception $e) {
                 $this->where('product_uuid',$product['product_uuid'])->update(array(
                     'status'=>3,

@@ -9,6 +9,26 @@
     <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <script>
+
+function skin() {
+            let skins = $("#skins").val()
+            let data = JSON.stringify({skins:skins}) 
+    $.ajax({
+        url:"https://www.pivix.cn/index/view/submitwant",
+        contentType: "application/json; charset=utf-8",
+        type: "POST",
+        data:data,
+        //dataType:"json",
+        success:function(result){
+        if (result.code == 1 ){
+            alert("提交成功");
+            location.reload()
+        }else{
+            alert(result.msg)
+        }
+     }
+    });
+        }
         function save_money() {
             let money = $("#save").val()
             let data = JSON.stringify({money:money}) 
@@ -100,18 +120,25 @@
         </div>
         <div class="user_info">
             <span>待存的钱</span><span>{{bank_wait_save_money}} {{currency_name}}</span>     
-            <span>
+            <!-- <span>
                 <input type="number" min = "1" id="save">
                 <button onclick="save_money()">存钱</button>
-            </span>
+            </span> -->
         </div>
         <div class="user_info">
             <span>待取的钱</span><span>{{bank_wait_take_money}} {{currency_name}}</span>
-            <span>
+            <!-- <span>
                 <input type="number" min = "1" id="take">
                 <button onclick="take_money()">取钱</button>
-            </span>
+            </span> -->
         </div>
+        <!-- <div class="user_info">
+            <span>想要的皮肤顺序</span>
+            <span>
+                <input type="text" id="skins">
+                <button onclick="skin()">提交</button>
+            </span>
+        </div> -->
         <div class="user_info">
             <span>银行利息</span><span>{{bank_money_tow}} {{currency_name}} (预期利息: {{bank_money_tow_expected}} {{currency_name}})</span>
         </div>
