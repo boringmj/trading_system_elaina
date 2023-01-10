@@ -27,6 +27,7 @@ class Index extends Controller {
             return json(-1,'qq不能为空');
         if(empty($price))
             return json(-1,'价格不能为空');
+        $price=round((float)$price,2);
         // 验证签名
         $data=array(
             'cdk'=>$cdk,
