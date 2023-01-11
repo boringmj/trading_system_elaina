@@ -68,6 +68,16 @@ return array(
                 )
             )
         )
+    ),
+    'tool'=>array(
+        'apply'=>array(
+            'group'=>array(
+                'max'=>4, // 每组最大成员数(修改后立即生效,已经超过该上限的组无法新增成员,但已经加入的成员不受影响)
+                'private'=>true, // 是否允许新建私有组
+                'public'=>true, // 是否允许新建公开组
+                'match'=>true, // 是否允许匹配公开组
+            )
+        )
     )
 );
 

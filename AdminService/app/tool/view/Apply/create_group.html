@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<head>
+    <!--适应手机-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    </script>
+    <style>
+        .info {
+            font-size: 20px;
+            margin-bottom: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="container-fluid">
+        <div class="info">
+            当前允许的队伍最大成员数为: {{max}} 人, 当前{{public}}创建公开队伍, {{private}}创建私有队伍。
+        </div>
+        <form>
+            <div class="form-group">
+                <label for="group_name">队伍名称</label>
+                <input type="text" class="form-control" id="group_name" placeholder="队伍名称">
+            </div>
+            <div class="form-group">
+                <label for="group_type">队伍类型</label>
+                <select class="form-control" id="group_type">
+                    <option value="public">公开</option>
+                    <option value="private">私有</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">创建队伍</button>
+        </form>
+    </div>
+    <script>
+        $(function () {
+            $('form').submit(function (e) {
+                e.preventDefault();
+                var group_name = $('#group_name').val();
+                var group_type = $('#group_type').val();
+                $.ajax({
+                    url: '/tool/apply/create_group',
+                    type: 'POST',
+                    data: {
+                        group_name: group_name,
+                        group_type: group_type
+                    },
+                    success: function (data) {
+                        if (data.code == 1) {
+                            alert('创建成功');
+                            window.location.href = '/tool/apply/admin/goto/index';
+                        } else {
+                            alert(data.msg);
+                        }
+                    },
+                    error: function (data) {
+                        alert('网络发生错误');
+                    }
+                });
+            });
+        });
+    </script>
+</body>

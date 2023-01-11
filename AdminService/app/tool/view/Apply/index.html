@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<head>
+    <!--适应手机-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    </script>
+    <style>
+        .info {
+            font-size: 20px;
+            margin-bottom: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="container-fluid">
+        <div class="info">
+            您好, {{nickname}} ! 您的队伍是: {{group_name}}, 队伍ID: {{guid}}。
+        </div>
+        <a href="/tool/apply/admin/goto/create_group" class="btn btn-primary">创建队伍</a>
+        <a href="/tool/apply/admin/goto/join_group" class="btn btn-primary">匹配队伍</a>
+        <a href="/tool/apply/admin/goto/leave_group" class="btn btn-primary">退出队伍</a>
+    </div>
+    <br>
+    <div class="info">
+        我的组员
+    </div>
+    <table class='table table-bordered'>
+        <thead>
+            <tr>
+                <th>昵称</th>
+                <th>QQ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{group_user}}
+        </tbody>
+    </table>
+    <br>
+    <div class="info">
+        可加入的公开队伍
+    </div>
+    <table class='table table-bordered'>
+        <thead>
+            <tr>
+                <th>队名</th>
+                <th>成员</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{all_group}}
+        </tbody>
+    </table>
+    <div class="info">
+        加入指定队伍
+    </div>
+    <form>
+        <div class="form-group">
+            <label for="exampleInputEmail1">队伍ID</label>
+            <input type="text" class="form-control" id="exampleInputEmail1" placeholder="队伍ID" v-model="group_id">
+        </div>
+        <button type="submit" class="btn btn-primary">加入</button>
+    </form>
+    <script>
+        $(function () {
+            $('form').submit(function (e) {
+                e.preventDefault();
+                var group_id = $('#exampleInputEmail1').val();
+                $.ajax({
+                    url: '/tool/apply/admin/goto/join_group',
+                    type: 'POST',
+                    data: {
+                        group_id: group_id
+                    },
+                    success: function (data) {
+                        if (data.code == 0) {
+                            alert(data.msg);
+                        }
+                        window.location.reload();
+                    },
+                    error: function (data) {
+                        alert('网络发生错误');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
