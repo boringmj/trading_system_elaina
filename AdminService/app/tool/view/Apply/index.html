@@ -24,48 +24,48 @@
         <a href="/tool/apply/admin/goto/create_group" class="btn btn-primary">创建队伍</a>
         <a href="/tool/apply/admin/goto/join_group" class="btn btn-primary">匹配队伍</a>
         <a href="/tool/apply/admin/goto/leave_group" class="btn btn-primary">退出队伍</a>
-    </div>
-    <br>
-    <div class="info">
-        我的组员
-    </div>
-    <table class='table table-bordered'>
-        <thead>
-            <tr>
-                <th>昵称</th>
-                <th>QQ</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{group_user}}
-        </tbody>
-    </table>
-    <br>
-    <div class="info">
-        可加入的公开队伍
-    </div>
-    <table class='table table-bordered'>
-        <thead>
-            <tr>
-                <th>队名</th>
-                <th>成员</th>
-                <th>操作</th>
-            </tr>
-        </thead>
-        <tbody>
-            {{all_group}}
-        </tbody>
-    </table>
-    <div class="info">
-        加入指定队伍
-    </div>
-    <form>
-        <div class="form-group">
-            <label for="exampleInputEmail1">队伍ID</label>
-            <input type="text" class="form-control" id="exampleInputEmail1" placeholder="队伍ID" v-model="group_id">
+        <br>
+        <div class="info">
+            我的组员
         </div>
-        <button type="submit" class="btn btn-primary">加入</button>
-    </form>
+        <table class='table table-bordered'>
+            <thead>
+                <tr>
+                    <th>昵称</th>
+                    <th>QQ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{group_user}}
+            </tbody>
+        </table>
+        <br>
+        <div class="info">
+            可加入的公开队伍
+        </div>
+        <table class='table table-bordered'>
+            <thead>
+                <tr>
+                    <th>队名</th>
+                    <th>成员</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{all_group}}
+            </tbody>
+        </table>
+        <div class="info">
+            加入指定队伍
+        </div>
+        <form>
+            <div class="form-group">
+                <label for="exampleInputEmail1">队伍ID</label>
+                <input type="text" class="form-control" id="exampleInputEmail1" placeholder="队伍ID" v-model="group_id">
+            </div>
+            <button type="submit" class="btn btn-primary">加入</button>
+        </form>
+    </div>
     <script>
         $(function () {
             $('form').submit(function (e) {
