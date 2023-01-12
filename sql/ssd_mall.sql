@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS `ssd_mall` (
   `product_code` varchar(36) NOT NULL,
   `status` int NOT NULL DEFAULT 1,
   `price` DECIMAL(8,2) NOT NULL DEFAULT 0.00,
+  `describe` varchar(1024) NULL DEFAULT '',
   `priority` int  NULL DEFAULT 0,
   `buy_uuid` varchar(36) NULL DEFAULT '',
   `create_time` int  NOT NULL,

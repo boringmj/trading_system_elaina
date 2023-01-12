@@ -148,17 +148,11 @@ class Mall extends Model {
         $product_uuid=\AdminService\common\uuid(true);
         // 上架商品
         $privilege_quick=App::getClass('Config')::get('app.config.all.mall.privilege.'.$uuid.'.quick',false);
-        $skins = "" ;
-        if(count($info['info']) > 1){
-            foreach ($info['info'] as $key => $value) {
-                $skins .= "," . $value['skinname'];
-            }
-        }
-        if($tag === ''){
-            $tag = substr($skins, 1);
-        }else{
-            $tag .= $skins;
-        }
+        $skins="" ;
+        if(count($info['info']) > 1)
+            foreach($info['info'] as $value)
+                $skins.=",".$value['skinname'];
+        $describe=substr($skins,1);
         $this->insert(array(
             'uuid'=>$uuid,
             'cdkey'=>$cdkey,
@@ -168,6 +162,7 @@ class Mall extends Model {
             'status'=>0,
             'tag'=>$tag,
             'price'=>$price,
+            'describe'=>$describe,
             'create_time'=>($privilege_quick?time()-600:time()),
         ));
         return array(
@@ -191,7 +186,7 @@ class Mall extends Model {
         $page=$page<1?1:$page;
         $limit=$limit<1?1:$limit;
         $offset=($page-1)*$limit;
-        $sql="SELECT `product_uuid`,`product_name`,`product_code`,`price`,`create_time`,`tag` FROM `{$this->table_name}` WHERE `status`=1 ORDER BY `priority` DESC,`price` ASC,`id` DESC LIMIT ?,?";
+        $sql="SELECT `product_uuid`,`product_name`,`describe`,`product_code`,`price`,`create_time`,`tag` FROM `{$this->table_name}` WHERE `status`=1 ORDER BY `priority` DESC,`price` ASC,`id` DESC LIMIT ?,?";
         try {
             $db=$this->getDb();
             // 执行查询
@@ -210,6 +205,7 @@ class Mall extends Model {
                 $product['product_name']=htmlspecialchars($product['product_name']??'');
                 $product['product_code']=htmlspecialchars($product['product_code']??'');
                 $product['tag']=htmlspecialchars($product['tag']??'');
+                $product['describe']=htmlspecialchars($product['describe']??'');
                 // 保留两位小数
                 $product['price']=round($product['price'],2);
                 // 将tag转换为数组
@@ -236,7 +232,7 @@ class Mall extends Model {
      * @throws Exception
      */
     public function getInfo(string $product_uuid): array {
-        $product=$this->where('product_uuid',$product_uuid)->where('status',1)->find(array('uuid','cdkey','product_name','product_code','price','create_time','tag'));
+        $product=$this->where('product_uuid',$product_uuid)->where('status',1)->find(array('uuid','cdkey','product_name','product_code','describe','price','create_time','tag'));
         if(empty($product))
             throw new Exception('商品不存在');
         // 判断商品代码对应的图片是否存在
@@ -247,6 +243,7 @@ class Mall extends Model {
         // 防止xss攻击
         $product['product_name']=htmlspecialchars($product['product_name']??'');
         $product['product_code']=htmlspecialchars($product['product_code']??'');
+        $product['describe']=htmlspecialchars($product['describe']??'');
         $product['tag']=htmlspecialchars($product['tag']??'');
         // 保留两位小数
         $product['price']=round($product['price'],2);

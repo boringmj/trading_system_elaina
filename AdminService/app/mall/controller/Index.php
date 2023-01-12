@@ -80,6 +80,7 @@ class Index extends Controller {
                 'img'=>$result['img'],
                 'tag'=>$result['tag'],
                 'is_user'=>($result['uuid']===$uuid||$admin_show),
+                'describe'=>$result['describe']
             ));
         } catch (Exception $e) {
             return json(-1,$e->getMessage());
