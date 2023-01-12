@@ -61,7 +61,7 @@ abstract class Router {
             'ip'=>isset($_SERVER['REMOTE_ADDR'])?$_SERVER['REMOTE_ADDR']:'0.0.0.0',
             'forwarder_ip'=>isset($_SERVER['HTTP_X_FORWARDED_FOR'])?$_SERVER['HTTP_X_FORWARDED_FOR']:'0.0.0.0',
             'post'=>self::filterPrivacy($_POST),
-            'json'=>self::filterPrivacy(json_decode(file_get_contents('php://input'),true)),
+            'json'=>self::filterPrivacy(json_decode(file_get_contents('php://input'),true)??[]),
             'get'=>self::filterPrivacy($_GET),
             'cookie'=>self::filterPrivacy($_COOKIE)
         ));
