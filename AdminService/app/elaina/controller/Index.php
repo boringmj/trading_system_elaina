@@ -87,9 +87,10 @@ class Index extends Controller
         $kid = $this->param('kid') == $nid ? '' : $this->param('kid');
         $kid = $kid ?? '';
         $nickname = $this->param('name') ?? '';
-        preg_match_all('/([a-zA-Z0-9_\x{4e00}-\x{9fa5}])+/u', $nickname, $data);
+        //preg_match_all('/([a-zA-Z0-9_\x{4e00}-\x{9fa5}])+/u', $nickname, $data);
+        $nickname = preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $nickname);
         // 将结果的第一个字符集合并
-        $nickname = implode($data[0]??[])??'';
+        //$nickname = implode($data[0]??[])??'';
         //校验net_id
         if ($this->checkNetId($nid))
             return json(-1, "nid error");
@@ -137,7 +138,7 @@ class Index extends Controller
         }
         try {
             $Skins = new Skins();
-            $skininfo = $Skins->getSkins($kid);
+            $skininfo = $Skins->getSkinsFromDST($kid);
             return json(1, 'ok', $skininfo);
         } catch (Exception $e) {
             return json(-1, $e->getMessage());
@@ -205,28 +206,43 @@ class Index extends Controller
             return json(-1, $e->getMessage());
         }
     }
-
-
-
-    public function debug()
-    {        
-
-        $name = '󰀒九轩󰀒';
-        // $log=new Log("skins");
-        // $a =base64_encode($name);
-        // $log->write($a);
-        // $log->write($name);
-        
-        // PHP通过正则表达式
-        preg_match_all('/([a-zA-Z0-9_\x{4e00}-\x{9fa5}])+/u', $name, $data);
-        // 将结果的第一个字符集合并
-        $name = implode($data[0]??[]);
-        $User = new User;
-        $User->debug($name);
-        return json(1, 'ok', array());
+    public function registergift()
+    {
+        $token = $this->param('token')??'';
+        try {
+            $Token = new Token();
+            $userinfo = $Token->getTokenInfo($token);
+            if (empty($userinfo['klei_id'])) {
+                throw new Exception('当前处于离线状态,无法获取皮肤');
+            }
+            $skingift = array();
+            $Skins = new Skins();
+            $skinlist = $Skins->getLongSkins($userinfo['klei_id']);
+            $User = new \AdminService\model\User();
+            $item_id = 0 ;
+            if($User->getUserIsRegister($userinfo['net_id'])){
+                if(!in_array("magic_wand_cj_skin_lan",$skinlist)){
+                    $Skins->activationSkins($userinfo['klei_id'], 'magic_wand_cj_skin_lan', '岚');
+                    $skingift[] = array('item' => 'magic_wand_cj_skin_lan', 'item_id' => $item_id,'gifttype'=>'ELAINASKIN');
+                }
+                if(!in_array("magic_wand_cj_skin_dai",$skinlist)){
+                    $Skins->activationSkins($userinfo['klei_id'], 'magic_wand_cj_skin_dai', '黛');
+                    $skingift[] = array('item' => 'magic_wand_cj_skin_dai', 'item_id' => $item_id,'gifttype'=>'ELAINASKIN');
+                }
+            }
+            if(in_array('elaina_alxy',$skinlist) && !in_array('elaina_bag_skin_altu',$skinlist)){
+                $Skins->activationSkins($userinfo['klei_id'], 'elaina_bag_skin_altu', '爱莉兔');
+                $skingift[] = array('item' => 'elaina_bag_skin_altu', 'item_id' => $item_id,'gifttype'=>'ELAINASKIN');
+            }
+            if(empty($skingift)){
+                return json(-1, 'nogift');
+            }else{
+                return json(1, 'ok',$skingift);
+            }
+        } catch (Exception $e) {
+            return json(-1, $e->getMessage());
+        }
     }
-
-
     public function getplayerlist()
     {
         $data = array(  

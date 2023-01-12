@@ -123,15 +123,18 @@ class Cdkey extends Model {
         $item_id = 0;
         $skingift = array();
         foreach ($this->skininfo as $key => $value) {
-            if ($Skins->hasSkins($kid,$value['skinprefab'])){
-                continue;
-            }
-            $this->updateCdk($value['id'],$kid);
             if($value['skin_expire_time'] < 0){
+                if ($Skins->hasLongSkins($kid,$value['skinprefab'])){
+                    continue;
+                }
                 $Skins->activationSkins($kid,$value['skinprefab'],$value['skinname']);
             }else{
+                if ($Skins->hasTmpSkins($kid,$value['skinprefab'])){
+                    continue;
+                }
                 $Skins->activationTempSkins($kid,$value['skinprefab'],$value['skinname'],$value['skin_expire_time']);
             }
+            $this->updateCdk($value['id'],$kid);
             $skingift[] = array('item' => $value['skinprefab'], 'item_id' => $item_id,'gifttype'=>'ELAINASKIN');
             $item_id++;
         }

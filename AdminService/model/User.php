@@ -155,6 +155,26 @@ class User extends Model {
     }
 
     /**
+     * 通过username判断用户是否存在以及正常
+     * 
+     * @access public
+     * @param string $username
+     * @return bool
+     * @throws Exception
+     */
+    public function getUserIsRegister(string $username): bool {
+        $user_info=$this->where('username',$username)->find();
+        if (empty($user_info))
+            return false;
+        if($user_info['status']!==1)
+            return false;
+        return true;
+    }
+
+
+
+
+    /**
      * 通过UUID修改用户密码
      * 
      * @access public

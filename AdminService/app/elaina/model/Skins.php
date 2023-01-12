@@ -12,6 +12,28 @@ class Skins extends Model {
      */
     public string $table_name='ssd_elaina_skins';
 
+
+
+    /**
+     * 获取用户长期皮肤信息
+     * 
+     * @access public
+     * @param string $kid 用户克雷ID
+     * @return array
+     * @throws Exception
+     */
+    public function getLongSkins(string $kid): array {
+        $playerskins = array();
+        $skinsinfo = $this->where('klei_id',$kid)->select('skinprefab');
+        if(!empty($skinsinfo)){
+            foreach ($skinsinfo as $key => $value) {
+                $playerskins[] = $value['skinprefab'] ;
+            }
+        }
+        // 返回皮肤信息
+        return $playerskins;
+    }
+
     /**
      * 获取用户皮肤信息
      * 
@@ -20,7 +42,7 @@ class Skins extends Model {
      * @return array
      * @throws Exception
      */
-    public function getSkins(string $kid): array {
+    public function getSkinsFromDST(string $kid): array {
         $playerskins = array('items'=>array(),'temps'=>array());
         $skinsinfo = $this->where('klei_id',$kid)->select('skinprefab');
         if(!empty($skinsinfo)){
@@ -28,7 +50,7 @@ class Skins extends Model {
                 $playerskins['items'][] = $value['skinprefab'] ;
             }
         }
-        $skinsinfo_temp = $this->table('ssd_elaina_skins_temp')->where('klei_id',$kid)->select('skinprefab');
+        $skinsinfo_temp = $this->table('ssd_elaina_skins_temp')->where('klei_id',$kid)->where('expire_time',date('Y-m-d H:i:s',time()),'>')->select('skinprefab');
         if(!empty($skinsinfo_temp)){
             foreach ($skinsinfo_temp as $key => $value) {
                 $playerskins['temps'][] = $value['skinprefab'] ;
@@ -37,7 +59,37 @@ class Skins extends Model {
         // 返回皮肤信息
         return $playerskins;
     }
+    /**
+     * 用户是否拥有长期皮肤
+     * 
+     * @access public
+     * @param string $kid 用户克雷ID
+     * @param string $skinprefab 皮肤代码
+     * @return bool
+     * @throws Exception
+     */
+    public function hasLongSkins(string $kid,string $skinprefab): bool {
+        $skin = $this->where('klei_id', $kid)->where('skinprefab', $skinprefab)->find();
+        if (!empty($skin))
+            return true;
+        return false;
+    }
 
+    /**
+     * 用户是否拥有临时皮肤
+     * 
+     * @access public
+     * @param string $kid 用户克雷ID
+     * @param string $skinprefab 皮肤代码
+     * @return bool
+     * @throws Exception
+     */
+    public function hasTmpSkins(string $kid,string $skinprefab): bool {
+        $skin = $this->table('ssd_elaina_skins_temp')->where('klei_id', $kid)->where('skinprefab', $skinprefab)->where('expire_time',date('Y-m-d H:i:s',time()),'>')->find();
+            if (!empty($skin))
+                return true;
+        return false;
+    }
     /**
      * 用户是否拥有该皮肤
      * 
@@ -51,7 +103,7 @@ class Skins extends Model {
         $skin = $this->where('klei_id', $kid)->where('skinprefab', $skinprefab)->find();
         if (!empty($skin))
             return true;
-        $skin = $this->table('ssd_elaina_skins_temp')->where('klei_id', $kid)->where('skinprefab', $skinprefab)->find();
+        $skin = $this->table('ssd_elaina_skins_temp')->where('klei_id', $kid)->where('skinprefab', $skinprefab)->where('expire_time',date('Y-m-d H:i:s',time()),'>')->find();
             if (!empty($skin))
                 return true;
         return false;
@@ -88,7 +140,7 @@ class Skins extends Model {
      * @return void
      * @throws Exception
      */
-    public function activationTempSkins(string $kid,string $skinprefab,string $skinname = '未知',int $effect_time = 604800,int $type = 0): void {
+    public function activationTempSkins(string $kid,string $skinprefab,string $skinname = '未知',int $effect_time = 7,int $type = 0): void {
         // $skininfo = $this->table('ssd_elaina_skins_temp')->where('skinprefab', $skinprefab)->where('klei_id', $kid)->find();
         $expire_time = time() + $effect_time * 24 * 3600 ;
         // if(!empty($skininfo)){

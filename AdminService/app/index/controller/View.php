@@ -238,6 +238,12 @@ class View extends Controller {
         $password=$this->param('password','');
         $goto=$this->param('goto','/index/view/index');
         $goto=urldecode($goto);
+        // 记录日志
+        $log=App::getClass('Log');
+        $log=new $log('login');
+        $log->write('{goto}',array(
+            'goto'=>$goto
+        ));
         // 判断连接是否以“/”开头
         if(substr($goto,0,1)!='/')
             $goto='/index/view/index';
