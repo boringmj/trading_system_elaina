@@ -39,21 +39,14 @@ class Apply extends Controller {
         $group_user=$ApplyPlayer->getMemberByGuid($group_info['guid']??'');
         $group_user_temp='';
         foreach($group_user as $user) {
-            $group_user_temp.="<tr>
-                <td>".htmlspecialchars($user['name'])."</td>
-                <td>".htmlspecialchars($user['qq'])."</td>
-            <tr>";
+            $group_user_temp.="<tr><td>".htmlspecialchars($user['name'])."</td><td>".htmlspecialchars($user['qq'])."</td></tr>";
         }
         // 获取全部组
         $ApplyGroup=new ApplyGroup();
         $all_group=$ApplyGroup->getAll();
         $all_group_temp='';
         foreach($all_group as $group) {
-            $all_group_temp.="<tr>
-                <td>".htmlspecialchars($group['name'])."</td>
-                <td>{$group['count']}</td>
-                <td><a href='/tool/apply/admin/goto/join_group/group_id/{$group['guid']}'>加入</a></td>
-            <tr>";
+            $all_group_temp.="<tr><td>".htmlspecialchars($group['name'])."</td><td>{$group['count']}</td><td><a href='/tool/apply/admin/goto/join_group/group_id/{$group['guid']}'>加入</a></td></tr>";
         }
         return view('index',array(
             'title'=>'报名申请',
