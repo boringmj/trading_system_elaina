@@ -56,11 +56,12 @@ abstract class Router {
         // 日志名称是今天的日期
         $file_name=date('Y-m-d').'-request';
         $log=new $log_class($file_name);
-        $log->write('Request URI: {uri} by {ip}({forwarder_ip}) - post: {post} | get: {get} | cookie: {cookie}',array(
+        $log->write('Request URI: {uri} by {ip}({forwarder_ip}) - post: {post} | json: {json} | get: {get} | cookie: {cookie}',array(
             'uri'=>$uri,
             'ip'=>isset($_SERVER['REMOTE_ADDR'])?$_SERVER['REMOTE_ADDR']:'0.0.0.0',
             'forwarder_ip'=>isset($_SERVER['HTTP_X_FORWARDED_FOR'])?$_SERVER['HTTP_X_FORWARDED_FOR']:'0.0.0.0',
             'post'=>self::filterPrivacy($_POST),
+            'json'=>self::filterPrivacy(json_decode(file_get_contents('php://input'),true)),
             'get'=>self::filterPrivacy($_GET),
             'cookie'=>self::filterPrivacy($_COOKIE)
         ));
